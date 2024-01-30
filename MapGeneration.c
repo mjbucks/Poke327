@@ -103,7 +103,7 @@ void place_trees(){
     for(int i = tree_y; i < tree_height + tree_y; i++){
         for(int j = tree_x; j < tree_width + tree_x; j++){
             if(isBorder(i, j) == 0){
-                map[i][j] = '.';
+                map[i][j] = '^';
             }
         }
     }

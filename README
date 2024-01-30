@@ -1,1 +1,5 @@
 This is a README file for the pokemon game for COM S 327 at Iowa State.
+
+Assignment01: This is the map generation assignment. To run this, run 'make' in the terminal, and then run './MapGeneration'.
+Once this has been done, the output of the map should be displayed. There should be trees, water, short/tall grass, mountains, a pokemart, and a pokecenter
+printed to the console. There should also be paths going N-S and E-W, as well as the pmarts and pcenters should be along the path.
