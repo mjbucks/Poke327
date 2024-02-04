@@ -6,6 +6,7 @@ struct map {
   double y_pos;
   int gates[4]; //N, S, E, W
   char terrain[21][80];
+  int is_generated;
 };
 
 int generate_map(struct map *m);
