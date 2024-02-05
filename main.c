@@ -27,6 +27,12 @@ int main(int argc, char *argv[])
         for (int j = 0; j < WORLD_WIDTH; j++) {
             world[i][j] = &world_memory_pool[i * WORLD_WIDTH + j];
             world[i][j]->is_generated = 0;
+            world[i][j]->path_east = -1;
+            world[i][j]->path_west = -1;
+            world[i][j]->path_north = -1;
+            world[i][j]->path_south = -1;
+            world[i][j]->x_pos = j;
+            world[i][j]->x_pos = i;
         }
     }
 
@@ -49,8 +55,12 @@ int main(int argc, char *argv[])
 
         if (command == 'q') {
             break;
-        } else if (command == 'n') {
+        } if (command == 'n') {
             if (player_y + 1 < WORLD_HEIGHT) {
+                if (world[player_y+1][player_x]->is_generated == 0) {
+                    generate_map(world[player_y+1][player_x]);
+                    world[player_y+1][player_x]->is_generated = 1;
+                }
                 player_y++;
             } else {
                 printf("You can't go further north!\n");

@@ -2,11 +2,14 @@
 #define MAP_H
 
 struct map {
-  double x_pos;
-  double y_pos;
-  int gates[4]; //N, S, E, W
   char terrain[21][80];
   int is_generated;
+  int path_north;
+  int path_south;
+  int path_east;
+  int path_west;
+  int x_pos;
+  int y_pos;
 };
 
 int generate_map(struct map *m);

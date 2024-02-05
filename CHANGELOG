@@ -1,7 +1,12 @@
+ASSIGNMENT 1:
 1/28/24 6:26 pm Started map generation assignment and starting to set up git repo.
 1/28/24 8:59 pm Just finished adding tall/short grass, mountain and water random generation onto the map. Paths and centers are next, then done.
 1/29/24 7:15 pm Spent an hour trying to connect pyrite to vscode while stuck in an infinite password loop. Started making paths and pokecenters once logged in.
 1/29/24 9:11 pm Just finished adding paths and pokecenters/pokemarts. Code seems to work well and output is printing well.
 
+ASSIGNMENT 2:
 2/3/2024 2:00pm Started working on making map data structure.
+2/3/2024 6:24pm Map data structure is made, and world is 2d array of pointers. N, S, E, W and fly work and use memory to save maps.
+Now need to connect paths and deal with corners/edges of world.
+2/4/2024 4:45 pm Worked late last night but I keep getting segmentation faults when trying to connect paths between maps. Not sure why at all.
 
