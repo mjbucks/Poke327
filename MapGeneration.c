@@ -110,29 +110,51 @@ void place_trees(struct map *m){
 }
 
 void place_paths(struct map *m){
-    m->path_south = (m->path_south == -1) ? rand()%75+3 : m->path_south;
-    m->path_east = (m->path_east == -1) ? rand()%15+3 : m->path_east;
-    m->path_north = (m->path_north == -1) ? rand()%75+3 : m->path_north;
-    m->path_west = (m->path_west == -1) ? rand()%15+3 : m->path_west;
+    m->path_south = (m->path_south == 0) ? rand()%75+3 : m->path_south;
+    m->path_east = (m->path_east == 0) ? rand()%15+3 : m->path_east;
+    m->path_north = (m->path_north == 0) ? rand()%75+3 : m->path_north;
+    m->path_west = (m->path_west == 0) ? rand()%15+3 : m->path_west;
+
     int path_north = m->path_north;
     int path_south = m->path_south;
     int path_east = m->path_east;
     int path_west = m->path_west;
 
-
     int randx = rand()%75+3;
     int randy = rand()%15+3;
+    for(int i = 0; i < MAP_HEIGHT; i++){
+            for(int j = 0; j < MAP_WIDTH; j++){
+                printf("%c ", m->terrain[i][j]);
+            }
+            printf("\n");
+        }
 
     for(int i = 0; i <= randy; i++){
-        m->terrain[i][m->path_north] = '#';
+        m->terrain[i][path_north] = '#';
     }
-    for(int i = MAP_HEIGHT; i >= randy; i--){
+    for(int i = MAP_HEIGHT - 1; i >= randy; i--){
         m->terrain[i][path_south] = '#';
     }
-    for(int i = 0; i <= randx; i++){
+    for(int i = MAP_WIDTH - 1; i >= randx; i--){
+        // if(i > 60){
+        //     printf("i randx: %d\n", i);
+        //     for(int i = 0; i < MAP_HEIGHT; i++){
+        //         for(int j = 0; j < MAP_WIDTH; j++){
+        //             printf("%c ", m->terrain[i][j]);
+        //         }
+        //         printf("\n");
+        //     }
+        // }
         m->terrain[path_east][i] = '#';
     }
-    for(int i = MAP_WIDTH; i >= randx; i--){
+    printf("Current terrain after N, S, E are printed:\n");
+    for(int i = 0; i < MAP_HEIGHT; i++){
+            for(int j = 0; j < MAP_WIDTH; j++){
+                printf("%c ", m->terrain[i][j]);
+            }
+            printf("\n");
+    }
+    for(int i = 0; i <= randx; i++){
         m->terrain[path_west][i] = '#';
     }
     for(int i = MIN(path_north, path_south); i <= MAX(path_south, path_north); i++){

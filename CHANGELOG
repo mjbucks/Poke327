@@ -9,4 +9,6 @@ ASSIGNMENT 2:
 2/3/2024 6:24pm Map data structure is made, and world is 2d array of pointers. N, S, E, W and fly work and use memory to save maps.
 Now need to connect paths and deal with corners/edges of world.
 2/4/2024 4:45 pm Worked late last night but I keep getting segmentation faults when trying to connect paths between maps. Not sure why at all.
+2/5/2024 12:15 pm Worked late last night again and kept getting seg faults when trying to connect paths. Fixed some of the issues but debugging for now.
+2/6/2024 6:00pm Working on restructuring my memory allocating and debugging my errors. Starting to make some progress but still lots of seg faults/errors.
 
