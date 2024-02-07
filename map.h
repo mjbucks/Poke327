@@ -1,5 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
+#define WORLD_WIDTH 401
+#define WORLD_HEIGHT 401
 
 struct map {
   char terrain[21][80];
@@ -12,6 +14,6 @@ struct map {
   int y_pos;
 };
 
-int generate_map(struct map *m);
+int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH]);
 
 #endif // MAP_H

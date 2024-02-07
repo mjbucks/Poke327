@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 
 
     // GENERATE AND PRINT CENTER MAP
-    generate_map(world[player_y][player_x]);
+    generate_map(world[player_y][player_x], world);
     world[player_y][player_x]->is_generated = 1;
     for(int i = 0; i < MAP_HEIGHT; i++){
             for(int j = 0; j < MAP_WIDTH; j++){
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
                     }
                     printf("Path south in main: %d\n", world[player_y+1][player_x]->path_south);
 
-                    generate_map(world[player_y+1][player_x]);
+                    generate_map(world[player_y+1][player_x], world);
                     world[player_y+1][player_x]->is_generated = 1;
                 }
                 player_y++;
@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
                     }
                     printf("Path south in main: %d\n", world[player_y-1][player_x]->path_south);
 
-                    generate_map(world[player_y-1][player_x]);
+                    generate_map(world[player_y-1][player_x], world);
                     world[player_y-1][player_x]->is_generated = 1;
                 }
                 player_y--;
@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
                     }
                     printf("Path south in main: %d\n", world[player_y][player_x+1]->path_south);
 
-                    generate_map(world[player_y][player_x+1]);
+                    generate_map(world[player_y][player_x+1], world);
                     world[player_y][player_x+1]->is_generated = 1;
                 }
                 player_x++;
@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
                     }
                     printf("Path  in main: %d\n", world[player_y][player_x-1]->path_east);
 
-                    generate_map(world[player_y][player_x-1]);
+                    generate_map(world[player_y][player_x-1], world);
                     world[player_y][player_x-1]->is_generated = 1;
                 }
                 player_x--;
@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "Failed to allocate memory for world[%d][%d]\n", player_y, player_x);
                 return 1;
             }
-            generate_map(world[player_y][player_x]);
+            generate_map(world[player_y][player_x], world);
             world[player_y][player_x]->is_generated = 1;
         }
 

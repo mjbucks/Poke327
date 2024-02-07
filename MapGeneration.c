@@ -7,6 +7,8 @@
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define MAP_WIDTH 80
 #define MAP_HEIGHT 21
+#define WORLD_WIDTH 401
+#define WORLD_HEIGHT 401
 
 int isBorder(int y, int x) {
     if (x == 0 || x == MAP_WIDTH-1 || y == 0 || y == MAP_HEIGHT-1){
@@ -109,7 +111,29 @@ void place_trees(struct map *m){
     }
 }
 
-void place_paths(struct map *m){
+void place_paths(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH]){
+    int x_pos = m->x_pos;
+    int y_pos = m->y_pos;
+    if((x_pos != WORLD_HEIGHT-1) && (world[y_pos][x_pos+1] != NULL)){
+
+        m->path_east = world[y_pos][x_pos+1]->path_west;
+
+    }
+    if((x_pos != 0) && (world[y_pos][x_pos-1] != NULL)){
+
+        m->path_west = world[y_pos][x_pos-1]->path_east;
+
+    }
+    if((y_pos != 0) && (world[y_pos-1][x_pos] != NULL)){
+
+        m->path_south = world[y_pos-1][x_pos]->path_north;
+
+    }
+    if((y_pos != WORLD_HEIGHT-1) && (world[y_pos+1][x_pos] != NULL)){
+
+        m->path_north = world[y_pos+1][x_pos]->path_south;
+
+    }
     m->path_south = (m->path_south == 0) ? rand()%75+3 : m->path_south;
     m->path_east = (m->path_east == 0) ? rand()%15+3 : m->path_east;
     m->path_north = (m->path_north == 0) ? rand()%75+3 : m->path_north;
@@ -122,12 +146,12 @@ void place_paths(struct map *m){
 
     int randx = rand()%75+3;
     int randy = rand()%15+3;
-    for(int i = 0; i < MAP_HEIGHT; i++){
-            for(int j = 0; j < MAP_WIDTH; j++){
-                printf("%c ", m->terrain[i][j]);
-            }
-            printf("\n");
-        }
+    // for(int i = 0; i < MAP_HEIGHT; i++){
+    //         for(int j = 0; j < MAP_WIDTH; j++){
+    //             printf("%c ", m->terrain[i][j]);
+    //         }
+    //         printf("\n");
+    //     }
 
     for(int i = 0; i <= randy; i++){
         m->terrain[i][path_north] = '#';
@@ -147,13 +171,13 @@ void place_paths(struct map *m){
         // }
         m->terrain[path_east][i] = '#';
     }
-    printf("Current terrain after N, S, E are printed:\n");
-    for(int i = 0; i < MAP_HEIGHT; i++){
-            for(int j = 0; j < MAP_WIDTH; j++){
-                printf("%c ", m->terrain[i][j]);
-            }
-            printf("\n");
-    }
+    // printf("Current terrain after N, S, E are printed:\n");
+    // for(int i = 0; i < MAP_HEIGHT; i++){
+    //         for(int j = 0; j < MAP_WIDTH; j++){
+    //             printf("%c ", m->terrain[i][j]);
+    //         }
+    //         printf("\n");
+    // }
     for(int i = 0; i <= randx; i++){
         m->terrain[path_west][i] = '#';
     }
@@ -162,6 +186,22 @@ void place_paths(struct map *m){
     }
     for(int i = MIN(path_east, path_west); i <= MAX(path_east, path_west); i++){
         m->terrain[i][randx] = '#';
+    }
+
+    printf("%d\n", x_pos);
+    printf("%d\n", y_pos);
+
+    if (x_pos == WORLD_HEIGHT - 1){
+        m->terrain[path_east][MAP_WIDTH-1] = '%';
+    }
+    if (x_pos == 0){
+        m->terrain[path_west][0] = '%';
+    }
+    if (y_pos == WORLD_HEIGHT - 1){
+        m->terrain[0][path_north] = '%';
+    }
+    if (y_pos == 0){
+        m->terrain[MAP_HEIGHT-1][path_south] = '%';
     }
 }
 
@@ -193,7 +233,7 @@ void place_pcenter(struct map *m){
     }
 }
 
-int generate_map(struct map *m)
+int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH])
 {
     srand(time(NULL));
 
@@ -207,7 +247,7 @@ int generate_map(struct map *m)
     place_water(m);
     place_mountains(m);
     place_tall_grass(m);
-    place_paths(m);
+    place_paths(m, world);
     place_pcenter(m);
     place_pmart(m);
 
