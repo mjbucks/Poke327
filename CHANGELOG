@@ -12,4 +12,5 @@ Now need to connect paths and deal with corners/edges of world.
 2/5/2024 12:15 pm Worked late last night again and kept getting seg faults when trying to connect paths. Fixed some of the issues but debugging for now.
 2/6/2024 6:00pm Working on restructuring my memory allocating and debugging my errors. Starting to make some progress but still lots of seg faults/errors.
 2/6/2024 11:39pm Just finished restructing my memory, fixing bugs I found, and connecting the paths. All should work as intended as well as the corners and edge cases are fixed by blocking the path on the corners/edges. All that needs to be fixed is fly and add probability for pokemarts/pokecenters spawning and this assignment is DONE. It's been very challenging for me, but a great learning experience.
+2/7/2024 5:30-6-30pm
 

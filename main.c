@@ -76,8 +76,6 @@ int main(int argc, char *argv[])
                             world[player_y+1][player_x]->terrain[i][j] = ' ';
                         }
                     }
-                    printf("Path south in main: %d\n", world[player_y+1][player_x]->path_south);
-
                     generate_map(world[player_y+1][player_x], world);
                     world[player_y+1][player_x]->is_generated = 1;
                 }
@@ -105,8 +103,6 @@ int main(int argc, char *argv[])
                             world[player_y-1][player_x]->terrain[i][j] = ' ';
                         }
                     }
-                    printf("Path south in main: %d\n", world[player_y-1][player_x]->path_south);
-
                     generate_map(world[player_y-1][player_x], world);
                     world[player_y-1][player_x]->is_generated = 1;
                 }
@@ -134,8 +130,6 @@ int main(int argc, char *argv[])
                             world[player_y][player_x+1]->terrain[i][j] = ' ';
                         }
                     }
-                    printf("Path south in main: %d\n", world[player_y][player_x+1]->path_south);
-
                     generate_map(world[player_y][player_x+1], world);
                     world[player_y][player_x+1]->is_generated = 1;
                 }
@@ -163,8 +157,6 @@ int main(int argc, char *argv[])
                             world[player_y][player_x-1]->terrain[i][j] = ' ';
                         }
                     }
-                    printf("Path  in main: %d\n", world[player_y][player_x-1]->path_east);
-
                     generate_map(world[player_y][player_x-1], world);
                     world[player_y][player_x-1]->is_generated = 1;
                 }

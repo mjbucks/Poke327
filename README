@@ -3,3 +3,9 @@ This is a README file for the pokemon game for COM S 327 at Iowa State.
 Assignment01: This is the map generation assignment. To run this, run 'make' in the terminal, and then run './MapGeneration'.
 Once this has been done, the output of the map should be displayed. There should be trees, water, short/tall grass, mountains, a pokemart, and a pokecenter
 printed to the console. There should also be paths going N-S and E-W, as well as the pmarts and pcenters should be along the path.
+
+Assignment02: This is the world generation assignment. To run this, run 'make' in the terminal, and then run './main'.
+Once this has been done, the output of the first map (0,0) will be printed. From here, you can move N, S, E, W, F (fly) and notice the paths
+aligning as you move. Also, (0,0) spawns a guarenteed Pokemart and Pokecenter, but outside of that, probability decreases from ~50% to 0%
+as you get farther from the center of the world. You also should not be able to move outside of the 401x401 map world limit,
+either by flight or by manually moving to the world border.

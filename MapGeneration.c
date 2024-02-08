@@ -146,12 +146,6 @@ void place_paths(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH]){
 
     int randx = rand()%75+3;
     int randy = rand()%15+3;
-    // for(int i = 0; i < MAP_HEIGHT; i++){
-    //         for(int j = 0; j < MAP_WIDTH; j++){
-    //             printf("%c ", m->terrain[i][j]);
-    //         }
-    //         printf("\n");
-    //     }
 
     for(int i = 0; i <= randy; i++){
         m->terrain[i][path_north] = '#';
@@ -160,24 +154,8 @@ void place_paths(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH]){
         m->terrain[i][path_south] = '#';
     }
     for(int i = MAP_WIDTH - 1; i >= randx; i--){
-        // if(i > 60){
-        //     printf("i randx: %d\n", i);
-        //     for(int i = 0; i < MAP_HEIGHT; i++){
-        //         for(int j = 0; j < MAP_WIDTH; j++){
-        //             printf("%c ", m->terrain[i][j]);
-        //         }
-        //         printf("\n");
-        //     }
-        // }
         m->terrain[path_east][i] = '#';
     }
-    // printf("Current terrain after N, S, E are printed:\n");
-    // for(int i = 0; i < MAP_HEIGHT; i++){
-    //         for(int j = 0; j < MAP_WIDTH; j++){
-    //             printf("%c ", m->terrain[i][j]);
-    //         }
-    //         printf("\n");
-    // }
     for(int i = 0; i <= randx; i++){
         m->terrain[path_west][i] = '#';
     }
@@ -187,10 +165,6 @@ void place_paths(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH]){
     for(int i = MIN(path_east, path_west); i <= MAX(path_east, path_west); i++){
         m->terrain[i][randx] = '#';
     }
-
-    printf("%d\n", x_pos);
-    printf("%d\n", y_pos);
-
     if (x_pos == WORLD_HEIGHT - 1){
         m->terrain[path_east][MAP_WIDTH-1] = '%';
     }
@@ -256,15 +230,11 @@ int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH])
     double manhattanDistance = manhattan(m->y_pos - 200.0, m->x_pos - 200.0);
     int rand100 = rand()%100;
     double probability = ((-45.0 * manhattanDistance)/200.0 + 50.0)/100.0;
-    printf("Probability C: %f\n", probability);
-    printf("rand100:%f\n", rand100/100.0);
 
     if((m->x_pos == 200 && m->y_pos == 200) || (probability > rand100/100.0)){
         place_pcenter(m);
     }
     rand100 = rand()%100;
-    printf("Probability M: %f\n", probability);
-    printf("rand100:%f\n", rand100/100.0);
     if((m->x_pos == 200 && m->y_pos == 200) || (probability > rand100/100.0)){
         place_pmart(m);
     }
