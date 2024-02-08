@@ -233,6 +233,10 @@ void place_pcenter(struct map *m){
     }
 }
 
+double manhattan(int y, int x){
+    return abs(x) + abs(y);
+}
+
 int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH])
 {
     srand(time(NULL));
@@ -248,8 +252,22 @@ int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH])
     place_mountains(m);
     place_tall_grass(m);
     place_paths(m, world);
-    place_pcenter(m);
-    place_pmart(m);
+
+    double manhattanDistance = manhattan(m->y_pos - 200.0, m->x_pos - 200.0);
+    int rand100 = rand()%100;
+    double probability = ((-45.0 * manhattanDistance)/200.0 + 50.0)/100.0;
+    printf("Probability C: %f\n", probability);
+    printf("rand100:%f\n", rand100/100.0);
+
+    if((m->x_pos == 200 && m->y_pos == 200) || (probability > rand100/100.0)){
+        place_pcenter(m);
+    }
+    rand100 = rand()%100;
+    printf("Probability M: %f\n", probability);
+    printf("rand100:%f\n", rand100/100.0);
+    if((m->x_pos == 200 && m->y_pos == 200) || (probability > rand100/100.0)){
+        place_pmart(m);
+    }
 
     return 0;
 }

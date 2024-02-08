@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     char command;
     while (1) {
         printf("Current position: (%d, %d)\n", player_x-200, player_y-200);
-        printf("Enter a command (n/s/e/w to move, q to quit): ");
+        printf("Enter a command (n/s/e/w/f (fly) to move, q to quit): ");
         scanf(" %c", &command);
 
         if (command == 'q') {
@@ -179,6 +179,28 @@ int main(int argc, char *argv[])
             new_x += 200;
             new_y += 200;
             if (new_x >= 0 && new_x < WORLD_WIDTH && new_y >= 0 && new_y < WORLD_HEIGHT) {
+                if (world[new_y][new_x] == NULL) {
+                    world[new_y][new_x] = malloc(sizeof(struct map));
+                    if (world[new_y][new_x] == NULL) {
+                        fprintf(stderr, "Failed to allocate memory for map\n");
+                        return 1;
+                    }
+                    world[new_y][new_x]->is_generated = 0;
+                    world[new_y][new_x]->path_west = 0;
+                    world[new_y][new_x]->path_north = 0;
+                    world[new_y][new_x]->path_south = 0;
+                    world[new_y][new_x]->path_east = 0;
+                    world[new_y][new_x]->x_pos = new_x;
+                    world[new_y][new_x]->y_pos = new_y;
+                    for (int i = 0; i < MAP_HEIGHT; i++) {
+                        for (int j = 0; j < MAP_WIDTH; j++) {
+                            world[new_y][new_x]->terrain[i][j] = ' ';
+                        }
+                    }
+                    generate_map(world[new_y][new_x], world);
+                    world[new_y][new_x]->is_generated = 1;
+                }
+                player_x--;
                 player_x = new_x;
                 player_y = new_y;
             } else {
