@@ -14,3 +14,6 @@ Now need to connect paths and deal with corners/edges of world.
 2/6/2024 11:39pm Just finished restructing my memory, fixing bugs I found, and connecting the paths. All should work as intended as well as the corners and edge cases are fixed by blocking the path on the corners/edges. All that needs to be fixed is fly and add probability for pokemarts/pokecenters spawning and this assignment is DONE. It's been very challenging for me, but a great learning experience.
 2/7/2024 5:30-6-30pm
 
+ASSIGNMENT 3:
+2/11/2024 11:00am Starting adding heap data structure to project so that Dijsktras can be implemented.
+

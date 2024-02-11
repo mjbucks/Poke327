@@ -28,6 +28,15 @@ int canPlaceP(struct map *m,int y, int x){
     }
 }
 
+int canPlacePC(struct map *m,int y, int x){
+    if(m->terrain[y][x] == '#' && (y != 0 && x != 0 && y != MAP_HEIGHT - 1 && x != MAP_WIDTH - 1)){
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+
 void fill_board_with_short_grass(struct map *m){
     for(int i = 0; i < MAP_HEIGHT; i++){
         for(int j = 0; j < MAP_WIDTH; j++){
@@ -207,6 +216,20 @@ void place_pcenter(struct map *m){
     }
 }
 
+void place_pc(struct map *m){
+    int isPlaced = 0;
+    int randx;
+    int randy;
+    while(isPlaced == 0){
+        randx = rand()%75+3;
+        randy = rand()%15+3;
+        if(canPlacePC(m, randy, randx)){
+            m->terrain[randy][randx] = '@';
+            isPlaced = 1;
+        }
+    }
+}
+
 double manhattan(int y, int x){
     return abs(x) + abs(y);
 }
@@ -238,6 +261,8 @@ int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH])
     if((m->x_pos == 200 && m->y_pos == 200) || (probability > rand100/100.0)){
         place_pmart(m);
     }
+
+    place_pc(m);
 
     return 0;
 }
