@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <limits.h>
 #include "map.h"
+#include "pc.h"
+#include "heap.h"
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
@@ -9,6 +12,18 @@
 #define MAP_HEIGHT 21
 #define WORLD_WIDTH 401
 #define WORLD_HEIGHT 401
+#define PLAYER_TYPE_PC 1
+#define PLAYER_TYPE_HIKER 2
+#define PLAYER_TYPE_RIVAL 3
+#define PLAYER_TYPE_SWIMMER 4
+#define PLAYER_TYPE_OTHER 5
+
+typedef struct path {
+  heap_node_t *hn;
+  uint8_t pos[2];
+  uint8_t from[2];
+  int32_t cost;
+} path_t;
 
 int isBorder(int y, int x) {
     if (x == 0 || x == MAP_WIDTH-1 || y == 0 || y == MAP_HEIGHT-1){
@@ -216,7 +231,7 @@ void place_pcenter(struct map *m){
     }
 }
 
-void place_pc(struct map *m){
+void place_pc(struct map *m, struct pc* player){
     int isPlaced = 0;
     int randx;
     int randy;
@@ -225,6 +240,8 @@ void place_pc(struct map *m){
         randy = rand()%15+3;
         if(canPlacePC(m, randy, randx)){
             m->terrain[randy][randx] = '@';
+            player->map_x = randx;
+            player->map_y = randy;
             isPlaced = 1;
         }
     }
@@ -234,9 +251,117 @@ double manhattan(int y, int x){
     return abs(x) + abs(y);
 }
 
-int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH])
+
+// START HERE ------------------------------------------------------------
+// Function to compare nodes for the heap
+static int32_t path_cmp(const void *key, const void *with) {
+  return ((path_t *) key)->cost - ((path_t *) with)->cost;
+}
+
+// Function to get the cost of traversing a terrain type
+int get_cost_of_terrain(char terrain_type, int player_type) {
+    if (terrain_type == '#'){ // PATH
+        if (player_type != PLAYER_TYPE_SWIMMER){
+            return 10;
+        }
+        else {
+            return INT_MAX - 1;
+        }
+    }
+    if (terrain_type == 'M'){ // POKEMART
+        if (player_type == PLAYER_TYPE_PC){
+            return 10;
+        }
+        else if(player_type == PLAYER_TYPE_SWIMMER){
+            return INT_MAX - 1;
+        }
+        else {
+            return 50;
+        }
+    }
+    if (terrain_type == 'C'){ // POKECENTER
+        if (player_type == PLAYER_TYPE_PC){
+            return 10;
+        }
+        else if(player_type == PLAYER_TYPE_SWIMMER){
+            return INT_MAX - 1;
+        }
+        else {
+            return 50;
+        }
+    }
+    if (terrain_type == '.'){ // SHORT GRASS
+        if (player_type != PLAYER_TYPE_SWIMMER){
+            return 10;
+        }
+        else {
+            return INT_MAX - 1;
+        }
+    }
+    if (terrain_type == ':'){ // TALL GRASS
+        if (player_type == PLAYER_TYPE_PC || player_type == PLAYER_TYPE_RIVAL || player_type == PLAYER_TYPE_OTHER){
+            return 20;
+        }
+        else if(player_type == PLAYER_TYPE_HIKER){
+            return 15;
+        }
+        else {
+            return INT_MAX - 1;
+        }
+    }
+    if (terrain_type == '~'){ // WATER
+        if (player_type == PLAYER_TYPE_SWIMMER){
+            return 7;
+        }
+        else {
+            return INT_MAX - 1;
+        }
+    }
+    if (terrain_type == '%'){ // MOUNTAINS
+        if (player_type == PLAYER_TYPE_HIKER){
+            return 15;
+        }
+        else {
+            return INT_MAX - 1;
+        }
+    }
+    if (terrain_type == '^'){ // TREES
+        if (player_type == PLAYER_TYPE_HIKER){
+            return 15;
+        }
+        else {
+            return INT_MAX - 1;
+        }
+    }
+    return INT_MAX - 1;
+}
+
+void compute_cost_map(struct map *m, struct pc* player, int player_type) {
+    // Create a heap to store nodes with their tentative distances
+    heap_t heap;
+    heap_init(&heap, path_cmp, NULL);
+
+
+
+    // Free dynamically allocated memory
+    heap_delete(&heap);
+}
+// END HERE----------------------------------------------------
+
+
+int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH], struct pc* player)
 {
     srand(time(NULL));
+    for (int i = 0; i < MAP_HEIGHT; i++) {
+        for (int j = 0; j < MAP_WIDTH; j++) {
+            m->rival_costmap[i][j] = INT_MAX;
+        }
+    }
+    for (int i = 0; i < MAP_HEIGHT; i++) {
+        for (int j = 0; j < MAP_WIDTH; j++) {
+            m->hiker_costmap[i][j] = INT_MAX;
+        }
+    }
 
     fill_board_with_short_grass(m);
     place_trees(m);
@@ -262,7 +387,10 @@ int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH])
         place_pmart(m);
     }
 
-    place_pc(m);
+    place_pc(m, player);
 
+    // Initialize the graph and compute the cost map
+    // compute_cost_map(m, player, PLAYER_TYPE_HIKER);
+    // compute_cost_map(m, player, PLAYER_TYPE_RIVAL);
     return 0;
 }

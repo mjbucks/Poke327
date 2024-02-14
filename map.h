@@ -2,9 +2,12 @@
 #define MAP_H
 #define WORLD_WIDTH 401
 #define WORLD_HEIGHT 401
+#include "pc.h"
 
 struct map {
   char terrain[21][80];
+  int hiker_costmap[21][80];
+  int rival_costmap[21][80];
   int is_generated;
   int path_north;
   int path_south;
@@ -14,6 +17,6 @@ struct map {
   int y_pos;
 };
 
-int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH]);
+int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH], struct pc* player);
 
 #endif // MAP_H
