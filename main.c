@@ -47,13 +47,12 @@ int main(int argc, char *argv[])
     world[player->y][player->x]->is_generated = 1;
     for (int i = 0; i < 21; i++) {
         for (int j = 0; j < 80; j++) {
-            if (i == player->map_y && j == player->map_x){
-                world[player->y][player->x]->hiker_costmap[i][j] = 88;
+            if (world[player->y][player->x]->hiker_costmap[i][j] == INT_MAX){
+                printf("   ");
             }
-            if (world[player->y][player->x]->hiker_costmap[i][j] == INT_MAX - 1){
-                world[player->y][player->x]->hiker_costmap[i][j] = 99;
+            else{
+                printf("%02d ", abs(world[player->y][player->x]->hiker_costmap[i][j]% 100)); // Adjust to print the hiker cost map
             }
-            printf("%02d ", abs(world[player->y][player->x]->hiker_costmap[i][j]% 100)); // Adjust to print the hiker cost map
         }
         printf("\n");
     }

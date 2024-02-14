@@ -17,4 +17,5 @@ Now need to connect paths and deal with corners/edges of world.
 ASSIGNMENT 3:
 2/11/2024 11:00am Starting adding heap data structure to project so that Dijsktra's can be implemented.
 2/12/2024 6:30pm Adding player datatype and starting Dijkstra's.
+2/13/2024 5:30pm Dijkstra's from last night is not working, I am making a new version based off of the professor's code from last week now.
 

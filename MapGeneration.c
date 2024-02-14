@@ -25,6 +25,12 @@ typedef struct path {
   int32_t cost;
 } path_t;
 
+typedef enum dim {
+  dim_x,
+  dim_y,
+  num_dims
+} dim_t;
+
 int isBorder(int y, int x) {
     if (x == 0 || x == MAP_WIDTH-1 || y == 0 || y == MAP_HEIGHT-1){
         return 1;
@@ -265,7 +271,7 @@ int get_cost_of_terrain(char terrain_type, int player_type) {
             return 10;
         }
         else {
-            return INT_MAX - 1;
+            return INT_MAX;
         }
     }
     if (terrain_type == 'M'){ // POKEMART
@@ -273,7 +279,7 @@ int get_cost_of_terrain(char terrain_type, int player_type) {
             return 10;
         }
         else if(player_type == PLAYER_TYPE_SWIMMER){
-            return INT_MAX - 1;
+            return INT_MAX;
         }
         else {
             return 50;
@@ -284,7 +290,7 @@ int get_cost_of_terrain(char terrain_type, int player_type) {
             return 10;
         }
         else if(player_type == PLAYER_TYPE_SWIMMER){
-            return INT_MAX - 1;
+            return INT_MAX;
         }
         else {
             return 50;
@@ -295,7 +301,7 @@ int get_cost_of_terrain(char terrain_type, int player_type) {
             return 10;
         }
         else {
-            return INT_MAX - 1;
+            return INT_MAX;
         }
     }
     if (terrain_type == ':'){ // TALL GRASS
@@ -306,7 +312,7 @@ int get_cost_of_terrain(char terrain_type, int player_type) {
             return 15;
         }
         else {
-            return INT_MAX - 1;
+            return INT_MAX;
         }
     }
     if (terrain_type == '~'){ // WATER
@@ -314,7 +320,7 @@ int get_cost_of_terrain(char terrain_type, int player_type) {
             return 7;
         }
         else {
-            return INT_MAX - 1;
+            return INT_MAX;
         }
     }
     if (terrain_type == '%'){ // MOUNTAINS
@@ -330,18 +336,75 @@ int get_cost_of_terrain(char terrain_type, int player_type) {
             return 15;
         }
         else {
-            return INT_MAX - 1;
+            return INT_MAX;
         }
     }
-    return INT_MAX - 1;
+    return INT_MAX;
 }
 
 void compute_cost_map(struct map *m, struct pc* player, int player_type) {
     // Create a heap to store nodes with their tentative distances
     heap_t heap;
+    uint32_t x, y;
+    char terrain = ' ';
+    int cur_cost = 0;
     heap_init(&heap, path_cmp, NULL);
 
 
+    // START
+    static path_t path[MAP_HEIGHT][MAP_WIDTH], *p;
+    static uint32_t initialized = 0;
+
+  if (!initialized) {
+    for (y = 0; y < MAP_HEIGHT; y++) {
+      for (x = 0; x < MAP_WIDTH; x++) {
+        path[y][x].pos[dim_y] = y;
+        path[y][x].pos[dim_x] = x;
+      }
+    }
+    initialized = 1;
+  }
+  
+  for (y = 0; y < MAP_HEIGHT; y++) {
+    for (x = 0; x < MAP_WIDTH; x++) {
+      path[y][x].cost = INT_MAX - 1;
+    }
+  }
+
+  path[player->map_y][player->map_x].cost = 0;
+
+  heap_init(&heap, path_cmp, NULL);
+
+  for (y = 1; y < MAP_HEIGHT - 1; y++) {
+    for (x = 1; x < MAP_WIDTH - 1; x++) {
+      path[y][x].hn = heap_insert(&heap, &path[y][x]);
+    }
+  }
+
+  while ((p = heap_remove_min(&heap))) {
+    p->hn = NULL;
+
+    for (int i = -1; i <= 1; i++){
+        for (int j = -1; j <= 1; j++){
+            terrain = m->terrain[p->pos[dim_y] + i][p->pos[dim_x] + j];
+            cur_cost =  get_cost_of_terrain(terrain, player_type);
+            if((i == 0 && j == 0) || p->pos[dim_y] + i < 0 || p->pos[dim_y] + i >= MAP_HEIGHT || p->pos[dim_y] + j < 0 || p->pos[dim_y] + j >= MAP_WIDTH){
+                continue;
+            }
+            if(path[p->pos[dim_y] + i][p->pos[dim_x] + j].cost > path[p->pos[dim_y]][p->pos[dim_x]].cost + cur_cost){
+                path[p->pos[dim_y ] + i][p->pos[dim_x] + j].cost = path[p->pos[dim_y]][p->pos[dim_x]].cost + cur_cost;
+            }
+        }
+    }
+  }
+
+  if (player_type == PLAYER_TYPE_HIKER){
+    for(int i = 0; i < MAP_HEIGHT; i++){
+        for(int j = 0; j < MAP_WIDTH; j++){
+            m->hiker_costmap[i][j] = path[i][j].cost;
+        }
+    }
+  }
 
     // Free dynamically allocated memory
     heap_delete(&heap);
@@ -389,8 +452,15 @@ int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH], st
 
     place_pc(m, player);
 
+    for(int i = 0; i < MAP_HEIGHT; i++){
+            for(int j = 0; j < MAP_WIDTH; j++){
+                printf("%c ", m->terrain[i][j]);
+            }
+            printf("\n");
+    }
+
     // Initialize the graph and compute the cost map
-    // compute_cost_map(m, player, PLAYER_TYPE_HIKER);
+    compute_cost_map(m, player, PLAYER_TYPE_HIKER);
     // compute_cost_map(m, player, PLAYER_TYPE_RIVAL);
     return 0;
 }
