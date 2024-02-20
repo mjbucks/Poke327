@@ -247,6 +247,30 @@ int main(int argc, char *argv[])
         // }
 
         // THIS DISPLAYS THE MAP THE USER IS CURRENTLY ON
+        printf("Hiker map: \n");
+        for (int i = 0; i < 21; i++) {
+            for (int j = 0; j < 80; j++) {
+                if (world[player->y][player->x]->hiker_costmap[i][j] == INT16_MAX){
+                    printf("   ");
+                }
+                else{
+                    printf("%02d ", abs(world[player->y][player->x]->hiker_costmap[i][j]% 100)); // Adjust to print the hiker cost map
+                }
+            }
+            printf("\n");
+        }
+        printf("Rival map: \n");
+        for (int i = 0; i < 21; i++) {
+            for (int j = 0; j < 80; j++) {
+                if (world[player->y][player->x]->rival_costmap[i][j] == INT16_MAX){
+                    printf("   ");
+                }
+                else{
+                    printf("%02d ", abs(world[player->y][player->x]->rival_costmap[i][j]% 100)); // Adjust to print the hiker cost map
+                }
+            }
+            printf("\n");
+        }
         for(int i = 0; i < MAP_HEIGHT; i++){
             for(int j = 0; j < MAP_WIDTH; j++){
                 printf("%c ", world[player->y][player->x]->terrain[i][j]);

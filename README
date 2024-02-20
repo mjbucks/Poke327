@@ -9,3 +9,9 @@ Once this has been done, the output of the first map (0,0) will be printed. From
 aligning as you move. Also, (0,0) spawns a guarenteed Pokemart and Pokecenter, but outside of that, probability decreases from ~50% to 0%
 as you get farther from the center of the world. You also should not be able to move outside of the 401x401 map world limit,
 either by flight or by manually moving to the world border.
+
+Assignment03: This is the pathfinding for hikers and rivals assignment. To run this version of the code, run 'make' in the terminal, and then run './main'.
+Once this has been done, you will see the output of the hiker and rival maps for the current map (Initially 0,0). As you move from map to map, you should see
+the hiker and rival cost maps printed for those maps as well. Not only that, but if you go back to a previous map, you should see the same cost maps as before reprinted.
+These cost maps were made using a modified version of Dijkstra's algorithm and a heap data structure in Professor Sheaffer's code from 1.01. They will be used later on
+for finding the shortest path to the player character. Enjoy cost-mapping! 
