@@ -45,13 +45,26 @@ int main(int argc, char *argv[])
     // GENERATE AND PRINT CENTER MAP
     generate_map(world[player->y][player->x], world, player);
     world[player->y][player->x]->is_generated = 1;
+    printf("Hiker map: \n");
     for (int i = 0; i < 21; i++) {
         for (int j = 0; j < 80; j++) {
-            if (world[player->y][player->x]->hiker_costmap[i][j] == INT_MAX){
+            if (world[player->y][player->x]->hiker_costmap[i][j] == INT16_MAX){
                 printf("   ");
             }
             else{
                 printf("%02d ", abs(world[player->y][player->x]->hiker_costmap[i][j]% 100)); // Adjust to print the hiker cost map
+            }
+        }
+        printf("\n");
+    }
+    printf("Rival map: \n");
+    for (int i = 0; i < 21; i++) {
+        for (int j = 0; j < 80; j++) {
+            if (world[player->y][player->x]->rival_costmap[i][j] == INT16_MAX){
+                printf("   ");
+            }
+            else{
+                printf("%02d ", abs(world[player->y][player->x]->rival_costmap[i][j]% 100)); // Adjust to print the hiker cost map
             }
         }
         printf("\n");
