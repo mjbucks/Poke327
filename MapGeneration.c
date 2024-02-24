@@ -424,7 +424,7 @@ void compute_cost_map(struct map *m, struct pc* player, int player_type) {
 // END HERE----------------------------------------------------
 
 
-int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH], struct pc* player)
+int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH], struct pc* player, int numtrainers)
 {
     srand(time(NULL));
     for (int i = 0; i < MAP_HEIGHT; i++) {
@@ -463,6 +463,13 @@ int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH], st
     }
 
     place_pc(m, player);
+
+    // MAKE PC TERRAIN MAP EQUAL TO REG TERRAIN MAP
+    for (int i = 0; i < MAP_HEIGHT; i++) {
+        for (int j = 0; j < MAP_WIDTH; j++) {
+            m->terrain_with_npcs[i][j] = m->terrain[i][j];
+        }
+    }
 
     // Initialize the graph and compute the cost map
     compute_cost_map(m, player, PLAYER_TYPE_HIKER);

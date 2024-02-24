@@ -6,6 +6,7 @@
 
 struct map {
   char terrain[21][80];
+  char terrain_with_npcs[21][80];
   int hiker_costmap[21][80];
   int rival_costmap[21][80];
   int is_generated;
@@ -17,6 +18,6 @@ struct map {
   int y_pos;
 };
 
-int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH], struct pc* player);
+int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH], struct pc* player, int numtrainers);
 
 #endif // MAP_H

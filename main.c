@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <limits.h>
 
@@ -14,6 +15,21 @@
 
 int main(int argc, char *argv[])
 {
+    int numtrainers = 0;
+
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "--numtrainers") == 0 && i + 1 < argc) {
+            numtrainers = atoi(argv[i + 1]); // convert the next argument to an integer
+            break;
+        }
+    }
+
+    if(numtrainers == 0){
+        numtrainers = 8;
+    }
+
+    printf("Number of trainers: %d\n", numtrainers);
+
     srand(time(NULL));
     // ALLOCATE MEMORY FOR WORLD
     struct map* world[WORLD_HEIGHT][WORLD_WIDTH] = {NULL};
@@ -43,7 +59,7 @@ int main(int argc, char *argv[])
     }
     
     // GENERATE AND PRINT CENTER MAP
-    generate_map(world[player->y][player->x], world, player);
+    generate_map(world[player->y][player->x], world, player, numtrainers);
     world[player->y][player->x]->is_generated = 1;
     printf("Hiker map: \n");
     for (int i = 0; i < 21; i++) {
@@ -105,7 +121,7 @@ int main(int argc, char *argv[])
                             world[player->y+1][player->x]->terrain[i][j] = ' ';
                         }
                     }
-                    generate_map(world[player->y+1][player->x], world, player);
+                    generate_map(world[player->y+1][player->x], world, player, numtrainers);
                     world[player->y+1][player->x]->is_generated = 1;
                 }
                 player->y++;
@@ -132,7 +148,7 @@ int main(int argc, char *argv[])
                             world[player->y-1][player->x]->terrain[i][j] = ' ';
                         }
                     }
-                    generate_map(world[player->y-1][player->x], world, player);
+                    generate_map(world[player->y-1][player->x], world, player, numtrainers);
                     world[player->y-1][player->x]->is_generated = 1;
                 }
                 player->y--;
@@ -159,7 +175,7 @@ int main(int argc, char *argv[])
                             world[player->y][player->x+1]->terrain[i][j] = ' ';
                         }
                     }
-                    generate_map(world[player->y][player->x+1], world, player);
+                    generate_map(world[player->y][player->x+1], world, player, numtrainers);
                     world[player->y][player->x+1]->is_generated = 1;
                 }
                 player->x++;
@@ -186,7 +202,7 @@ int main(int argc, char *argv[])
                             world[player->y][player->x-1]->terrain[i][j] = ' ';
                         }
                     }
-                    generate_map(world[player->y][player->x-1], world, player);
+                    generate_map(world[player->y][player->x-1], world, player, numtrainers);
                     world[player->y][player->x-1]->is_generated = 1;
                 }
                 player->x--;
@@ -218,7 +234,7 @@ int main(int argc, char *argv[])
                             world[new_y][new_x]->terrain[i][j] = ' ';
                         }
                     }
-                    generate_map(world[new_y][new_x], world, player);
+                    generate_map(world[new_y][new_x], world, player, numtrainers);
                     world[new_y][new_x]->is_generated = 1;
                 }
                 player->x--;
@@ -234,17 +250,9 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "Failed to allocate memory for world[%d][%d]\n", player->y, player->x);
                 return 1;
             }
-            generate_map(world[player->y][player->x], world, player);
+            generate_map(world[player->y][player->x], world, player, numtrainers);
             world[player->y][player->x]->is_generated = 1;
         }
-
-
-        // for (int i = 0; i < 21; i++) {
-        //     for (int j = 0; j < 80; j++) {
-        //         printf("%2d ", world[player->y][player->x]->hiker_costmap[i][j]); // Adjust to print the hiker cost map
-        //     }
-        //     printf("\n");
-        // }
 
         // THIS DISPLAYS THE MAP THE USER IS CURRENTLY ON
         printf("Hiker map: \n");
