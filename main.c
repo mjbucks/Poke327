@@ -12,6 +12,7 @@
 #define WORLD_HEIGHT 401
 #define MAP_WIDTH 80
 #define MAP_HEIGHT 21
+#define MAX_TRAINERS 10
 
 int main(int argc, char *argv[])
 {
@@ -19,13 +20,20 @@ int main(int argc, char *argv[])
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--numtrainers") == 0 && i + 1 < argc) {
-            numtrainers = atoi(argv[i + 1]); // convert the next argument to an integer
-            break;
+            if (atoi(argv[i + 1]) > MAX_TRAINERS) {
+                printf("Number of trainers cannot exceed %d\n", MAX_TRAINERS);
+                printf("Setting number of trainers to %d\n", MAX_TRAINERS);
+                break;
+            }
+            else{
+                numtrainers = atoi(argv[i + 1]); // convert the next argument to an integer
+                break;
+            }
         }
     }
 
-    if(numtrainers == 0){
-        numtrainers = 8;
+    if(numtrainers <= 0){
+        numtrainers = MAX_TRAINERS;
     }
 
     printf("Number of trainers: %d\n", numtrainers);
@@ -61,33 +69,36 @@ int main(int argc, char *argv[])
     // GENERATE AND PRINT CENTER MAP
     generate_map(world[player->y][player->x], world, player, numtrainers);
     world[player->y][player->x]->is_generated = 1;
-    printf("Hiker map: \n");
-    for (int i = 0; i < 21; i++) {
-        for (int j = 0; j < 80; j++) {
-            if (world[player->y][player->x]->hiker_costmap[i][j] == INT16_MAX){
-                printf("   ");
-            }
-            else{
-                printf("%02d ", abs(world[player->y][player->x]->hiker_costmap[i][j]% 100)); // Adjust to print the hiker cost map
-            }
-        }
-        printf("\n");
-    }
-    printf("Rival map: \n");
-    for (int i = 0; i < 21; i++) {
-        for (int j = 0; j < 80; j++) {
-            if (world[player->y][player->x]->rival_costmap[i][j] == INT16_MAX){
-                printf("   ");
-            }
-            else{
-                printf("%02d ", abs(world[player->y][player->x]->rival_costmap[i][j]% 100)); // Adjust to print the hiker cost map
-            }
-        }
-        printf("\n");
-    }
+
+    // PRINT HIKER AND RIVAL MAPS
+    // printf("Hiker map: \n");
+    // for (int i = 0; i < 21; i++) {
+    //     for (int j = 0; j < 80; j++) {
+    //         if (world[player->y][player->x]->hiker_costmap[i][j] == INT16_MAX){
+    //             printf("   ");
+    //         }
+    //         else{
+    //             printf("%02d ", abs(world[player->y][player->x]->hiker_costmap[i][j]% 100)); // Adjust to print the hiker cost map
+    //         }
+    //     }
+    //     printf("\n");
+    // }
+    // printf("Rival map: \n");
+    // for (int i = 0; i < 21; i++) {
+    //     for (int j = 0; j < 80; j++) {
+    //         if (world[player->y][player->x]->rival_costmap[i][j] == INT16_MAX){
+    //             printf("   ");
+    //         }
+    //         else{
+    //             printf("%02d ", abs(world[player->y][player->x]->rival_costmap[i][j]% 100)); // Adjust to print the hiker cost map
+    //         }
+    //     }
+    //     printf("\n");
+    // }
+
     for(int i = 0; i < MAP_HEIGHT; i++){
             for(int j = 0; j < MAP_WIDTH; j++){
-                printf("%c ", world[player->y][player->x]->terrain[i][j]);
+                printf("%c ", world[player->y][player->x]->terrain_with_npcs[i][j]);
             }
             printf("\n");
     }
@@ -254,31 +265,6 @@ int main(int argc, char *argv[])
             world[player->y][player->x]->is_generated = 1;
         }
 
-        // THIS DISPLAYS THE MAP THE USER IS CURRENTLY ON
-        printf("Hiker map: \n");
-        for (int i = 0; i < 21; i++) {
-            for (int j = 0; j < 80; j++) {
-                if (world[player->y][player->x]->hiker_costmap[i][j] == INT16_MAX){
-                    printf("   ");
-                }
-                else{
-                    printf("%02d ", abs(world[player->y][player->x]->hiker_costmap[i][j]% 100)); // Adjust to print the hiker cost map
-                }
-            }
-            printf("\n");
-        }
-        printf("Rival map: \n");
-        for (int i = 0; i < 21; i++) {
-            for (int j = 0; j < 80; j++) {
-                if (world[player->y][player->x]->rival_costmap[i][j] == INT16_MAX){
-                    printf("   ");
-                }
-                else{
-                    printf("%02d ", abs(world[player->y][player->x]->rival_costmap[i][j]% 100)); // Adjust to print the hiker cost map
-                }
-            }
-            printf("\n");
-        }
         for(int i = 0; i < MAP_HEIGHT; i++){
             for(int j = 0; j < MAP_WIDTH; j++){
                 printf("%c ", world[player->y][player->x]->terrain[i][j]);

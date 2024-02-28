@@ -3,8 +3,12 @@
 #define WORLD_WIDTH 401
 #define WORLD_HEIGHT 401
 #include "pc.h"
+#include "npc.h"
+#define MAX_TRAINERS 10
+
 
 struct map {
+  struct npc npcs[MAX_TRAINERS];
   char terrain[21][80];
   char terrain_with_npcs[21][80];
   int hiker_costmap[21][80];

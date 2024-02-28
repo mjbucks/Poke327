@@ -5,6 +5,7 @@
 #include "map.h"
 #include "pc.h"
 #include "heap.h"
+#include "npc.h"
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
@@ -15,8 +16,7 @@
 #define PLAYER_TYPE_PC 1
 #define PLAYER_TYPE_HIKER 2
 #define PLAYER_TYPE_RIVAL 3
-#define PLAYER_TYPE_SWIMMER 4
-#define PLAYER_TYPE_OTHER 5
+#define PLAYER_TYPE_OTHER 4
 
 typedef struct path {
   heap_node_t *hn;
@@ -51,6 +51,17 @@ int canPlaceP(struct map *m,int y, int x){
 
 int canPlacePC(struct map *m,int y, int x){
     if(m->terrain[y][x] == '#' && (y != 0 && x != 0 && y != MAP_HEIGHT - 1 && x != MAP_WIDTH - 1)){
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+
+int canPlaceNPC(struct map *m,int y, int x){
+    if(m->rival_costmap[y][x] != INT16_MAX && 
+    (y != 0 && x != 0 && y != MAP_HEIGHT - 1 && x != MAP_WIDTH - 1) &&
+    (m->terrain_with_npcs[y][x] != 'M' || m->terrain_with_npcs[y][x] != 'C' || m->terrain_with_npcs[y][x] != '@' || m->terrain_with_npcs[y][x] != 'T')){
         return 1;
     }
     else{
@@ -244,11 +255,30 @@ void place_pc(struct map *m, struct pc* player){
     while(isPlaced == 0){
         randx = rand()%75+3;
         randy = rand()%15+3;
-        if(canPlacePC(m, randy, randx)){
-            m->terrain[randy][randx] = '@';
+        if(canPlacePC(m, randy, randx) == 1){
+            m->terrain_with_npcs[randy][randx] = '@';
             player->map_x = randx;
             player->map_y = randy;
             isPlaced = 1;
+        }
+    }
+}
+
+void place_npcs(struct map *m, struct pc* player, int numtrainers){
+    int isPlaced = 0;
+    int randx;
+    int randy;
+    for(int i = 0; i < numtrainers; i++){
+        isPlaced = 0;
+        while(isPlaced == 0){
+            randx = rand()%75+3;
+            randy = rand()%15+3;
+            if(canPlaceNPC(m, randy, randx) == 1){
+                m->terrain_with_npcs[randy][randx] = 'T';
+                m->npcs[i].x_pos = randx;
+                m->npcs[i].y_pos = randy;
+                isPlaced = 1;
+            }
         }
     }
 }
@@ -272,19 +302,11 @@ int get_cost_of_terrain(char terrain_type, int player_type, int y, int x) {
     }
 
     if (terrain_type == '#'){ // PATH
-        if (player_type != PLAYER_TYPE_SWIMMER){
-            return 10;
-        }
-        else {
-            return INT16_MAX;
-        }
+        return 10;
     }
     if (terrain_type == 'M'){ // POKEMART
         if (player_type == PLAYER_TYPE_PC){
             return 10;
-        }
-        else if(player_type == PLAYER_TYPE_SWIMMER){
-            return INT16_MAX;
         }
         else {
             return 50;
@@ -294,20 +316,12 @@ int get_cost_of_terrain(char terrain_type, int player_type, int y, int x) {
         if (player_type == PLAYER_TYPE_PC){
             return 10;
         }
-        else if(player_type == PLAYER_TYPE_SWIMMER){
-            return INT16_MAX;
-        }
         else {
             return 50;
         }
     }
     if (terrain_type == '.'){ // SHORT GRASS
-        if (player_type != PLAYER_TYPE_SWIMMER){
-            return 10;
-        }
-        else {
-            return INT16_MAX;
-        }
+        return 10;
     }
     if (terrain_type == ':'){ // TALL GRASS
         if (player_type == PLAYER_TYPE_PC || player_type == PLAYER_TYPE_RIVAL || player_type == PLAYER_TYPE_OTHER){
@@ -321,12 +335,7 @@ int get_cost_of_terrain(char terrain_type, int player_type, int y, int x) {
         }
     }
     if (terrain_type == '~'){ // WATER
-        if (player_type == PLAYER_TYPE_SWIMMER){
-            return 7;
-        }
-        else {
-            return INT16_MAX;
-        }
+        return INT16_MAX;
     }
     if (terrain_type == '%'){ // MOUNTAINS
         if (player_type == PLAYER_TYPE_HIKER){
@@ -462,8 +471,6 @@ int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH], st
         place_pmart(m);
     }
 
-    place_pc(m, player);
-
     // MAKE PC TERRAIN MAP EQUAL TO REG TERRAIN MAP
     for (int i = 0; i < MAP_HEIGHT; i++) {
         for (int j = 0; j < MAP_WIDTH; j++) {
@@ -471,8 +478,29 @@ int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH], st
         }
     }
 
+    place_pc(m, player);
+
     // Initialize the graph and compute the cost map
     compute_cost_map(m, player, PLAYER_TYPE_HIKER);
     compute_cost_map(m, player, PLAYER_TYPE_RIVAL);
+    
+
+    // FILL OUT NPC ARRAY
+    if (numtrainers >= 2) {
+        m->npcs[0].player_type = PLAYER_TYPE_HIKER;
+        m->npcs[1].player_type = PLAYER_TYPE_RIVAL;
+        for (int i = 2; i < numtrainers; i++) {
+            m->npcs[i].player_type = rand() % 3 + 2;
+        }
+    } else {
+        for (int i = 0; i < numtrainers; i++) {
+            m->npcs[i].player_type = rand() % rand() % 3 + 2;
+        }
+    }
+    
+    place_npcs(m, player, numtrainers);
+
+
+
     return 0;
 }
