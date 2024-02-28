@@ -16,7 +16,10 @@
 #define PLAYER_TYPE_PC 1
 #define PLAYER_TYPE_HIKER 2
 #define PLAYER_TYPE_RIVAL 3
-#define PLAYER_TYPE_OTHER 4
+#define PLAYER_TYPE_PACER 4
+#define PLAYER_TYPE_WANDERER 5
+#define PLAYER_TYPE_SENTRY 6
+#define PLAYER_TYPE_EXPLORER 7
 
 typedef struct path {
   heap_node_t *hn;
@@ -30,6 +33,27 @@ typedef enum dim {
   dim_y,
   num_dims
 } dim_t;
+
+char getPlayerChar(int player_type){
+    if (player_type == 1){
+        return '@';
+    } else if (player_type == 2){
+        return 'h';
+    } else if (player_type == 3){
+        return 'r';
+    } else if (player_type == 4){
+        return 'p';
+    } else if (player_type == 5){
+        return 'w';
+    } else if (player_type == 6){
+        return 's';
+    } else if (player_type == 7){
+        return 'e';
+    } else {
+        return 'L';
+    }
+    
+}
 
 int isBorder(int y, int x) {
     if (x == 0 || x == MAP_WIDTH-1 || y == 0 || y == MAP_HEIGHT-1){
@@ -58,15 +82,23 @@ int canPlacePC(struct map *m,int y, int x){
     }
 }
 
-int canPlaceNPC(struct map *m,int y, int x){
-    if(m->rival_costmap[y][x] != INT16_MAX && 
-    (y != 0 && x != 0 && y != MAP_HEIGHT - 1 && x != MAP_WIDTH - 1) &&
-    (m->terrain_with_npcs[y][x] != 'M' || m->terrain_with_npcs[y][x] != 'C' || m->terrain_with_npcs[y][x] != '@' || m->terrain_with_npcs[y][x] != 'T')){
-        return 1;
+int canPlaceNPC(struct map *m,int y, int x, int player_type){
+    if(player_type == PLAYER_TYPE_HIKER){
+        if(m->hiker_costmap[y][x] != INT16_MAX && 
+        (y != 0 && x != 0 && y != MAP_HEIGHT - 1 && x != MAP_WIDTH - 1) &&
+        (m->terrain_with_npcs[y][x] != 'M' || m->terrain_with_npcs[y][x] != 'C' || m->terrain_with_npcs[y][x] != '@' || m->terrain_with_npcs[y][x] != 'h' || m->terrain_with_npcs[y][x] != 'r'
+        || m->terrain_with_npcs[y][x] != 'p' || m->terrain_with_npcs[y][x] != 'w' || m->terrain_with_npcs[y][x] != 's' || m->terrain_with_npcs[y][x] != 'e')){
+            return 1;
+        }
+    } else{
+        if(m->rival_costmap[y][x] != INT16_MAX && 
+        (y != 0 && x != 0 && y != MAP_HEIGHT - 1 && x != MAP_WIDTH - 1) &&
+        (m->terrain_with_npcs[y][x] != 'M' || m->terrain_with_npcs[y][x] != 'C' || m->terrain_with_npcs[y][x] != '@' || m->terrain_with_npcs[y][x] != 'h' || m->terrain_with_npcs[y][x] != 'r'
+        || m->terrain_with_npcs[y][x] != 'p' || m->terrain_with_npcs[y][x] != 'w' || m->terrain_with_npcs[y][x] != 's' || m->terrain_with_npcs[y][x] != 'e')){
+            return 1;
+        }
     }
-    else{
-        return 0;
-    }
+    return 0;
 }
 
 void fill_board_with_short_grass(struct map *m){
@@ -273,8 +305,8 @@ void place_npcs(struct map *m, struct pc* player, int numtrainers){
         while(isPlaced == 0){
             randx = rand()%75+3;
             randy = rand()%15+3;
-            if(canPlaceNPC(m, randy, randx) == 1){
-                m->terrain_with_npcs[randy][randx] = 'T';
+            if(canPlaceNPC(m, randy, randx, m->npcs[i].player_type) == 1){
+                m->terrain_with_npcs[randy][randx] = getPlayerChar(m->npcs[i].player_type);
                 m->npcs[i].x_pos = randx;
                 m->npcs[i].y_pos = randy;
                 isPlaced = 1;
@@ -324,14 +356,11 @@ int get_cost_of_terrain(char terrain_type, int player_type, int y, int x) {
         return 10;
     }
     if (terrain_type == ':'){ // TALL GRASS
-        if (player_type == PLAYER_TYPE_PC || player_type == PLAYER_TYPE_RIVAL || player_type == PLAYER_TYPE_OTHER){
-            return 20;
-        }
-        else if(player_type == PLAYER_TYPE_HIKER){
+        if(player_type == PLAYER_TYPE_HIKER){
             return 15;
         }
         else {
-            return INT16_MAX;
+            return 20;
         }
     }
     if (terrain_type == '~'){ // WATER
@@ -490,11 +519,11 @@ int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH], st
         m->npcs[0].player_type = PLAYER_TYPE_HIKER;
         m->npcs[1].player_type = PLAYER_TYPE_RIVAL;
         for (int i = 2; i < numtrainers; i++) {
-            m->npcs[i].player_type = rand() % 3 + 2;
+            m->npcs[i].player_type = rand() % 6 + 2;
         }
     } else {
         for (int i = 0; i < numtrainers; i++) {
-            m->npcs[i].player_type = rand() % rand() % 3 + 2;
+            m->npcs[i].player_type = rand() % rand() % 6 + 2;
         }
     }
     
