@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <limits.h>
+#include <unistd.h>
 
 #include "map.h"
 #include "pc.h"
@@ -12,7 +13,7 @@
 #define WORLD_HEIGHT 401
 #define MAP_WIDTH 80
 #define MAP_HEIGHT 21
-#define MAX_TRAINERS 10
+#define MAX_TRAINERS 2
 
 typedef struct character_turn {
   heap_node_t *hn;
@@ -22,7 +23,12 @@ typedef struct character_turn {
 } character_turn_t;
 
 static int32_t path_cmp(const void *key, const void *with) {
-    return ((character_turn_t *) key)->time - ((character_turn_t *) with)->time;
+    int32_t time_difference = ((character_turn_t *)key)->time - ((character_turn_t *)with)->time;
+    if (time_difference != 0) {
+        return time_difference;
+    } else {
+        return ((character_turn_t *)key)->id - ((character_turn_t *)with)->id;
+    }
 }
 
 int main(int argc, char *argv[])
@@ -114,6 +120,8 @@ int main(int argc, char *argv[])
 
         if(cur->player_type != 2){
             cur->time += 20;
+            heap_remove_min(&heap);
+            heap_insert(&heap, &cur);
             continue;
         }
 
@@ -139,13 +147,22 @@ int main(int argc, char *argv[])
             }
         }
 
-        cur->time += min_cost;
+        cur->time += world[player->y][player->x]->hiker_costmap[cur_ypos][cur_xpos] - min_cost;
         world[player->y][player->x]->npcs[cur->id - 1].x_pos = next_x;
         world[player->y][player->x]->npcs[cur->id - 1].y_pos = next_y;
-        printf("%d\n", cur->time);
-        printf("%d\n", next_y);
-        printf("%d\n", next_x);
-        break;
+        world[player->y][player->x]->terrain_with_npcs[next_y][next_x] = world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos];
+        world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos] = world[player->y][player->x]->terrain[cur_ypos][cur_xpos];
+
+        for(int i = 0; i < MAP_HEIGHT; i++){
+            for(int j = 0; j < MAP_WIDTH; j++){
+                printf("%c ", world[player->y][player->x]->terrain_with_npcs[i][j]);
+            }
+            printf("\n");
+        }
+
+        heap_remove_min(&heap);
+        heap_insert(&heap, &cur);
+        usleep(250000);
 
     }
 
@@ -169,6 +186,12 @@ int main(int argc, char *argv[])
 
     return 0;
 
+
+        // next->id = cur->id;
+        // next->player_type = cur->player_type;
+        // next->time += cur->time + 20;
+        // heap_remove_min(&heap);
+        // heap_insert(&heap, &next);
 
 
     // OLD MAIN GAME LOOP!
