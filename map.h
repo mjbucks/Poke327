@@ -4,7 +4,7 @@
 #define WORLD_HEIGHT 401
 #include "pc.h"
 #include "npc.h"
-#define MAX_TRAINERS 2
+#define MAX_TRAINERS 5
 
 
 struct map {
