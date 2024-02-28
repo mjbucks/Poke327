@@ -87,6 +87,18 @@ int main(int argc, char *argv[])
     generate_map(world[player->y][player->x], world, player, numtrainers);
     world[player->y][player->x]->is_generated = 1;
 
+    printf("Hiker map: \n");
+    for (int i = 0; i < 21; i++) {
+        for (int j = 0; j < 80; j++) {
+            if (world[player->y][player->x]->hiker_costmap[i][j] == INT16_MAX){
+                printf("   ");
+            }
+            else{
+                printf("%02d ", abs(world[player->y][player->x]->hiker_costmap[i][j]% 100)); // Adjust to print the hiker cost map
+            }
+        }
+        printf("\n");
+    }
     for(int i = 0; i < MAP_HEIGHT; i++){
             for(int j = 0; j < MAP_WIDTH; j++){
                 printf("%c ", world[player->y][player->x]->terrain_with_npcs[i][j]);
@@ -119,9 +131,11 @@ int main(int argc, char *argv[])
         printf("%d\n", cur->player_type);
 
         if(cur->player_type != 2){
-            cur->time += 20;
+            characters[cur->id].time = cur->time + 20;
+            characters[cur->id].id = cur->id;
+            characters[cur->id].player_type = cur->player_type;
+            characters[cur->id].hn = heap_insert(&heap, &characters[cur->id]);
             heap_remove_min(&heap);
-            heap_insert(&heap, &cur);
             continue;
         }
 
@@ -133,13 +147,13 @@ int main(int argc, char *argv[])
 
         for (int i = -1; i <= 1; i++){
             for (int j = -1; j <= 1; j++){
-                if (world[player->y][player->x]->hiker_costmap[cur_ypos + i][cur_ypos + j] < min_cost && 
+                if (world[player->y][player->x]->hiker_costmap[cur_ypos + i][cur_xpos + j] < min_cost && 
                 (world[player->y][player->x]->terrain_with_npcs[cur_ypos + i][cur_ypos + j] != '@' || world[player->y][player->x]->terrain_with_npcs[cur_ypos + i][cur_ypos + j] != 'h' || 
                 world[player->y][player->x]->terrain_with_npcs[cur_ypos + i][cur_ypos + j] != 'r'|| world[player->y][player->x]->terrain_with_npcs[cur_ypos + i][cur_ypos + j] != 'p' || 
                 world[player->y][player->x]->terrain_with_npcs[cur_ypos + i][cur_ypos + j] != 'w' || world[player->y][player->x]->terrain_with_npcs[cur_ypos + i][cur_ypos + j] != 's' || 
                 world[player->y][player->x]->terrain_with_npcs[cur_ypos + i][cur_ypos + j] != 'e')) {
 
-                    min_cost = world[player->y][player->x]->hiker_costmap[cur_ypos + i][cur_ypos + j];
+                    min_cost = world[player->y][player->x]->hiker_costmap[cur_ypos + i][cur_xpos + j];
                     next_y = cur_ypos + i;
                     next_x = cur_xpos + j;
 
@@ -160,9 +174,13 @@ int main(int argc, char *argv[])
             printf("\n");
         }
 
+        characters[cur->id].time = cur->time;
+        characters[cur->id].id = cur->id;
+        characters[cur->id].player_type = cur->player_type;
+        characters[cur->id].hn = heap_insert(&heap, &characters[cur->id]);
         heap_remove_min(&heap);
-        heap_insert(&heap, &cur);
-        usleep(250000);
+
+        usleep(2500000);
 
     }
 
