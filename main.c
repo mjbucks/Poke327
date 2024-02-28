@@ -108,10 +108,45 @@ int main(int argc, char *argv[])
     }
 
     while((cur = heap_peek_min(&heap))){
-        printf("%d", cur->time);
-        printf("%d", cur->id);
-        printf("%d", cur->player_type);
+        printf("%d\n", cur->time);
+        printf("%d\n", cur->id);
+        printf("%d\n", cur->player_type);
+
+        if(cur->player_type != 2){
+            cur->time += 20;
+            continue;
+        }
+
+        int min_cost = INT16_MAX;
+        int cur_xpos = world[player->y][player->x]->npcs[cur->id - 1].x_pos;
+        int cur_ypos = world[player->y][player->x]->npcs[cur->id - 1].y_pos;
+        int next_x = 0;
+        int next_y = 0;
+
+        for (int i = -1; i <= 1; i++){
+            for (int j = -1; j <= 1; j++){
+                if (world[player->y][player->x]->hiker_costmap[cur_ypos + i][cur_ypos + j] < min_cost && 
+                (world[player->y][player->x]->terrain_with_npcs[cur_ypos + i][cur_ypos + j] != '@' || world[player->y][player->x]->terrain_with_npcs[cur_ypos + i][cur_ypos + j] != 'h' || 
+                world[player->y][player->x]->terrain_with_npcs[cur_ypos + i][cur_ypos + j] != 'r'|| world[player->y][player->x]->terrain_with_npcs[cur_ypos + i][cur_ypos + j] != 'p' || 
+                world[player->y][player->x]->terrain_with_npcs[cur_ypos + i][cur_ypos + j] != 'w' || world[player->y][player->x]->terrain_with_npcs[cur_ypos + i][cur_ypos + j] != 's' || 
+                world[player->y][player->x]->terrain_with_npcs[cur_ypos + i][cur_ypos + j] != 'e')) {
+
+                    min_cost = world[player->y][player->x]->hiker_costmap[cur_ypos + i][cur_ypos + j];
+                    next_y = cur_ypos + i;
+                    next_x = cur_xpos + j;
+
+                }
+            }
+        }
+
+        cur->time += min_cost;
+        world[player->y][player->x]->npcs[cur->id - 1].x_pos = next_x;
+        world[player->y][player->x]->npcs[cur->id - 1].y_pos = next_y;
+        printf("%d\n", cur->time);
+        printf("%d\n", next_y);
+        printf("%d\n", next_x);
         break;
+
     }
 
 
