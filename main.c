@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
     for(int i = 0; i < numtrainers; i++){
         characters[i+1].time = 0;
         characters[i+1].id = i + 1;
-        characters[i+1].player_type = world[player->map_y][player->map_x]->npcs[i].player_type;
+        characters[i+1].player_type = world[player->y][player->x]->npcs[i].player_type;
         characters[i+1].hn = heap_insert(&heap, &characters[i+1]);
     }
 
