@@ -4,6 +4,7 @@
 #include <time.h>
 #include <limits.h>
 #include <unistd.h>
+#include <ncurses.h>
 
 #include "map.h"
 #include "pc.h"
@@ -13,7 +14,8 @@
 #define WORLD_HEIGHT 401
 #define MAP_WIDTH 80
 #define MAP_HEIGHT 21
-#define MAX_TRAINERS 5
+#define MAX_TRAINERS 50
+#define DEFAULT_TRAINERS 10
 
 typedef struct character_turn {
   heap_node_t *hn;
@@ -31,29 +33,41 @@ static int32_t path_cmp(const void *key, const void *with) {
     }
 }
 
+void print_map(struct pc* player, struct map* world[WORLD_HEIGHT][WORLD_WIDTH]) {
+    move(1, 0);
+
+    for (int row = 0; row < MAP_HEIGHT; row++) {
+        for (int col = 0; col < MAP_WIDTH; col++) {
+            printw(world[player->y][player->x]->terrain_with_npcs);
+        }
+        printw("\n");
+    }
+    refresh();
+}
+
 int main(int argc, char *argv[])
 {
     int numtrainers = 0;
 
+    // DETERMINE THE NUMBER OF TRAINERS
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--numtrainers") == 0 && i + 1 < argc) {
             if (atoi(argv[i + 1]) > MAX_TRAINERS) {
                 printf("Number of trainers cannot exceed %d\n", MAX_TRAINERS);
-                printf("Setting number of trainers to %d\n", MAX_TRAINERS);
+                printf("Setting number of trainers to %d\n", DEFAULT_TRAINERS);
                 break;
             }
             else{
-                numtrainers = atoi(argv[i + 1]); // convert the next argument to an integer
+                numtrainers = atoi(argv[i + 1]);
                 break;
             }
         }
     }
 
     if(numtrainers <= 0){
-        numtrainers = MAX_TRAINERS;
+        numtrainers = DEFAULT_TRAINERS;
     }
-
-    printf("Number of trainers: %d\n", numtrainers);
+    // printf("Number of trainers: %d\n", numtrainers);
 
     srand(time(NULL));
     // ALLOCATE MEMORY FOR WORLD
@@ -86,12 +100,15 @@ int main(int argc, char *argv[])
     // GENERATE AND PRINT CENTER MAP
     generate_map(world[player->y][player->x], world, player, numtrainers);
     world[player->y][player->x]->is_generated = 1;
-    for(int i = 0; i < MAP_HEIGHT; i++){
-            for(int j = 0; j < MAP_WIDTH; j++){
-                printf("%c ", world[player->y][player->x]->terrain_with_npcs[i][j]);
-            }
-            printf("\n");
-    }
+    print_map(player, world);
+    // for(int i = 0; i < MAP_HEIGHT; i++){
+    //         for(int j = 0; j < MAP_WIDTH; j++){
+    //             printf("%c ", world[player->y][player->x]->terrain_with_npcs[i][j]);
+    //         }
+    //         printf("\n");
+    // }
+
+
 
     // HEAP FOR MAIN GAME LOOP
     heap_t heap;
@@ -165,7 +182,7 @@ int main(int argc, char *argv[])
         characters[cur->id].hn = heap_insert(&heap, &characters[cur->id]);
         heap_remove_min(&heap);
 
-        usleep(250000);
+        // usleep(250000);
 
     }
 
