@@ -54,7 +54,7 @@ void print_map(struct pc* player, struct map* world[WORLD_HEIGHT][WORLD_WIDTH]) 
 
     for (int row = 0; row < MAP_HEIGHT; row++) {
         for (int col = 0; col < MAP_WIDTH; col++) {
-            printw(world[player->y][player->x]->terrain_with_npcs);
+            printw("%c", world[player->y][player->x]->terrain_with_npcs[row][col]);
         }
         printw("\n");
     }
@@ -114,10 +114,19 @@ int main(int argc, char *argv[])
         }
     }
     
+    // Initialize ncurses
+    initscr();
+
+    // Disable line buffering and echoing
+    raw();
+
+    // Enable special keys recognition
+    keypad(stdscr, TRUE);
+
     // GENERATE AND PRINT CENTER MAP
     generate_map(world[player->y][player->x], world, player, numtrainers);
     world[player->y][player->x]->is_generated = 1;
-    print_map(player, world)
+    print_map(player, world);
 
     // HEAP FOR MAIN GAME LOOP
     heap_t heap;
@@ -444,12 +453,13 @@ int main(int argc, char *argv[])
             }
         }
 
-        for(int i = 0; i < MAP_HEIGHT; i++){
-            for(int j = 0; j < MAP_WIDTH; j++){
-                printf("%c ", world[player->y][player->x]->terrain_with_npcs[i][j]);
-            }
-            printf("\n");
-        }
+        // for(int i = 0; i < MAP_HEIGHT; i++){
+        //     for(int j = 0; j < MAP_WIDTH; j++){
+        //         printf("%c ", world[player->y][player->x]->terrain_with_npcs[i][j]);
+        //     }
+        //     printf("\n");
+        // }
+        print_map(player, world);
 
         characters[cur->id].time = cur->time;
         characters[cur->id].id = cur->id;
@@ -462,7 +472,8 @@ int main(int argc, char *argv[])
 
     }
 
-
+    // END CURSES
+    endwin();
 
     heap_delete(&heap);
 
