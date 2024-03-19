@@ -15,3 +15,20 @@ Once this has been done, you will see the output of the hiker and rival maps for
 the hiker and rival cost maps printed for those maps as well. Not only that, but if you go back to a previous map, you should see the same cost maps as before reprinted.
 These cost maps were made using a modified version of Dijkstra's algorithm and a heap data structure in Professor Sheaffer's code from 1.01. They will be used later on
 for finding the shortest path to the player character. Enjoy cost-mapping! 
+
+Assignment04: This is the implementing all characters moving assignment. To run this version of the code, run 'make' in the terminal, and then run './main'
+(I have been running into an error that I think is on pyrite where my code doesn't compile completely right due to file permissions. If this happens when you are testing,
+I kindly ask that you give it a couple tries after disconnecting from pyrite. I am fairly confident that it should work, but I get this error on my local and there's around
+a 50 percent chance that my code compiles correctly and I can test it. It has been very annoying.) Once the code compiles and has been run, You should see all npcs move as described
+in the assignment doc. Rivals and Hikers take their respective paths to the @. Pacers will go back and forth in once direction. Wanderers and Explorers will move straight
+until they can't and pick a random direction, and Sentries will stand still. It moves at an update rate of 4 frames per second, this can be adjusted towards the bottom of
+the uncommented code (line 447 ish in main) if you wish to make it faster. Happy NPC-ing!
+Error I am getting for reference:
+bash-5.2$ make
+gcc -Wall -Werror -g MapGeneration.c -c
+gcc -Wall -Werror -g main.c -c
+gcc -Wall -Werror -g heap.c -c
+gcc MapGeneration.o main.o heap.o -o main
+/usr/bin/ld: cannot open output file main: No such file or directory
+collect2: error: ld returned 1 exit status
+make: *** [Makefile:2: main] Error 1

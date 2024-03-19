@@ -23,6 +23,7 @@ ASSIGNMENT 3:
 ASSIGNMENT 4:
 2/24/2024 11:00am Starting working on implementing game queue and refactoring code
 2/27/2024 5:45pm Working on adding NPCs to make and completing game queue.
+2/28/2024 6:00pm Finished adding all of the characters and testing to see if their functionality works.
 
 ASSIGNMENT 5:
 3/18/2024 8:00am Started working on refactoring code for this assignment. Slowly changing prints to print using ncurses.
