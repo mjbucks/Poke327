@@ -148,6 +148,7 @@ int main(int argc, char *argv[])
         characters[i+1].hn = heap_insert(&heap, &characters[i+1]);
     }
 
+    char key = ' ';
     while((cur = heap_peek_min(&heap))){
         // printf("%d\n", cur->time);
         // printf("%d\n", cur->id);
@@ -159,7 +160,7 @@ int main(int argc, char *argv[])
         int next_y = 0;
 
         if(cur->player_type != PLAYER_TYPE_HIKER && cur->player_type != PLAYER_TYPE_RIVAL && cur->player_type != PLAYER_TYPE_PACER &&
-        cur->player_type != PLAYER_TYPE_WANDERER && cur->player_type != PLAYER_TYPE_EXPLORER){
+        cur->player_type != PLAYER_TYPE_WANDERER && cur->player_type != PLAYER_TYPE_EXPLORER && cur->player_type != PLAYER_TYPE_PC){
             characters[cur->id].time = cur->time + 20;
             characters[cur->id].id = cur->id;
             characters[cur->id].dir = cur->dir;
@@ -451,6 +452,8 @@ int main(int argc, char *argv[])
                     cur->dir = rand()%4;
                 }
             }
+        } else if (cur->player_type == PLAYER_TYPE_PC){
+
         }
 
         // for(int i = 0; i < MAP_HEIGHT; i++){
