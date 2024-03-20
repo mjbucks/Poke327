@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
         characters[i+1].hn = heap_insert(&heap, &characters[i+1]);
     }
 
-    char key = ' ';
+    char ch;
     while((cur = heap_peek_min(&heap))){
         // printf("%d\n", cur->time);
         // printf("%d\n", cur->id);
@@ -453,15 +453,82 @@ int main(int argc, char *argv[])
                 }
             }
         } else if (cur->player_type == PLAYER_TYPE_PC){
+            while ((ch = getch()) != 'Q') { // Press 'Q' to quit
+                switch(ch) {
+                    case '7': case 'y':
+                        if (world[player->y][player->x]->npcs[cur->id - 1].x_pos > 1 && world[player->y][player->x]->npcs[cur->id - 1].y_pos > 1 && world[player->y][player->x]->rival_costmap[cur_ypos - 1][cur_xpos - 1] < INT16_MAX &&
+                        (world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos - 1] != '@' && world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos - 1] != 'h' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos - 1] != 'r' && world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos - 1] != 'p' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos - 1] != 'w' && world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos - 1] != 's' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos - 1] != 'e')) {
+                            next_x--;
+                            next_y--; 
 
+                            cur->time += abs(world[player->y][player->x]->rival_costmap[cur_ypos][cur_xpos] - world[player->y][player->x]->rival_costmap[next_y][next_x]);
+                            world[player->y][player->x]->npcs[cur->id - 1].x_pos = next_x;
+                            world[player->y][player->x]->npcs[cur->id - 1].y_pos = next_y;
+                            world[player->y][player->x]->terrain_with_npcs[next_y][next_x] = world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos];
+                            world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos] = world[player->y][player->x]->terrain[cur_ypos][cur_xpos];
+                        } else if (){
+
+                        } // Move upper left
+                        break;
+                    case '8': case 'k':
+                        if (world[player->y][player->x]->npcs[cur->id - 1].y_pos > 1 && world[player->y][player->x]->rival_costmap[cur_ypos - 1][cur_xpos] < INT16_MAX){
+                            next_y--;
+                        } // Move up
+                        break;
+                    case '9': case 'u':
+                        if (world[player->y][player->x]->npcs[cur->id - 1].y_pos > 1 && world[player->y][player->x]->npcs[cur->id - 1].x_pos < 79 && world[player->y][player->x]->rival_costmap[cur_ypos - 1][cur_xpos + 1] < INT16_MAX) {
+                            next_y--;
+                            next_x++;
+                        } // Move upper right
+                        break;
+                    case '6': case 'l':
+                        if (world[player->y][player->x]->npcs[cur->id - 1].x_pos < 79 && world[player->y][player->x]->rival_costmap[cur_ypos][cur_xpos + 1] < INT16_MAX){
+                            next_x++;
+                        } // Move right
+                        break;
+                    case '3': case 'n':
+                        if (world[player->y][player->x]->npcs[cur->id - 1].y_pos < 20 && world[player->y][player->x]->npcs[cur->id - 1].x_pos < 79 && world[player->y][player->x]->rival_costmap[cur_ypos + 1][cur_xpos + 1] < INT16_MAX) {
+                            next_x++;
+                            next_y++;
+                        } // Move lower right
+                        break;
+                    case '2': case 'j':
+                        if (world[player->y][player->x]->npcs[cur->id - 1].y_pos < 20 && world[player->y][player->x]->rival_costmap[cur_ypos + 1][cur_xpos] < INT16_MAX){
+                            next_y++;
+                        } // Move down
+                        break;
+                    case '1': case 'b':
+                        if (world[player->y][player->x]->npcs[cur->id - 1].y_pos < 20 && world[player->y][player->x]->npcs[cur->id - 1].x_pos > 1 &&  world[player->y][player->x]->rival_costmap[cur_ypos + 1][cur_xpos - 1] < INT16_MAX) {
+                            next_y++;
+                            next_x--;
+                        } // Move lower left
+                        break;
+                    case '4': case 'h':
+                        if (world[player->y][player->x]->npcs[cur->id - 1].x_pos > 0 &&  world[player->y][player->x]->rival_costmap[cur_ypos][cur_xpos - 1] < INT16_MAX){
+                            next_x--;
+                        } // Move left
+                        break;
+                    case '>':
+                        // Placeholder for entering a building interface
+                        printw("Entering building interface...");
+                        getch(); // Wait for user input to continue
+                        break;
+                    case '5': case ' ': case '.':
+                        // Rest for a turn
+                        break;
+                    case 't':
+                        // Display a list of trainers
+                        printw("Trainer list:\n");
+                        // Placeholder for trainer list display
+                        getch(); // Wait for user input to continue
+                        break;
+                }
+            }
         }
 
-        // for(int i = 0; i < MAP_HEIGHT; i++){
-        //     for(int j = 0; j < MAP_WIDTH; j++){
-        //         printf("%c ", world[player->y][player->x]->terrain_with_npcs[i][j]);
-        //     }
-        //     printf("\n");
-        // }
         print_map(player, world);
 
         characters[cur->id].time = cur->time;

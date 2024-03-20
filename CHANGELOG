@@ -28,4 +28,5 @@ ASSIGNMENT 4:
 ASSIGNMENT 5:
 3/18/2024 8:00am Started working on refactoring code for this assignment. Slowly changing prints to print using ncurses.
 3/19/2024 9:00am ncurses is printing the maps correctly, just need to add in user input and color.
+3/19/2024 9:30pm Working on player input and moving the pc.
 
