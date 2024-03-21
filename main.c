@@ -50,11 +50,60 @@ static int32_t path_cmp(const void *key, const void *with) {
 
 // PRINT MAP USING NCURSES
 void print_map(struct pc* player, struct map* world[WORLD_HEIGHT][WORLD_WIDTH]) {
+    clear();
     move(1, 0);
+
+    start_color();
+    init_pair(1, COLOR_WHITE, COLOR_GREEN);
+    init_pair(9, COLOR_GREEN, COLOR_BLACK);
+    init_pair(2, COLOR_BLACK, COLOR_BLUE);
+    init_pair(3, COLOR_RED, COLOR_BLACK);   
+    init_pair(4, COLOR_WHITE, COLOR_YELLOW); 
+    init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(6, COLOR_CYAN, COLOR_BLACK);  
+    init_pair(7, COLOR_BLACK, COLOR_WHITE); 
+    init_pair(8, COLOR_BLACK, COLOR_WHITE);
 
     for (int row = 0; row < MAP_HEIGHT; row++) {
         for (int col = 0; col < MAP_WIDTH; col++) {
-            printw("%c", world[player->y][player->x]->terrain_with_npcs[row][col]);
+            char terrain_char = world[player->y][player->x]->terrain_with_npcs[row][col];
+            switch (terrain_char) {
+                case '.':
+                    attron(COLOR_PAIR(4));
+                    printw("%c", terrain_char);
+                    attroff(COLOR_PAIR(4));
+                    break;
+                case ':':
+                    attron(COLOR_PAIR(1));
+                    printw("%c", terrain_char);
+                    attroff(COLOR_PAIR(1));
+                    break;
+                case '~':
+                    attron(COLOR_PAIR(2));
+                    printw("%c", terrain_char);
+                    attroff(COLOR_PAIR(2));
+                    break;
+                case '%':
+                    attron(COLOR_PAIR(7));
+                    printw("%c", terrain_char);
+                    attroff(COLOR_PAIR(7));
+                    break;
+                case '^':
+                    attron(COLOR_PAIR(9));
+                    printw("%c", terrain_char);
+                    attroff(COLOR_PAIR(9));
+                    break;
+                case '@':
+                    attron(COLOR_PAIR(6));
+                    printw("%c", terrain_char);
+                    attroff(COLOR_PAIR(6));
+                    break;
+                default:
+                    attron(COLOR_PAIR(3));
+                    printw("%c", terrain_char);
+                    attroff(COLOR_PAIR(3));
+                    break;
+            }
         }
         printw("\n");
     }
@@ -463,11 +512,12 @@ int main(int argc, char *argv[])
                 }
             }
         } else if (cur->player_type == PLAYER_TYPE_PC){
+            int leave = 1;
             while ((ch = getch())) { // Press 'Q' to quit
                 switch(ch) {
                     case 'Q':
-                        endwin(); // End ncurses mode
-                        exit(0);  // Exit the program
+                        endwin();
+                        exit(0);
                         break;
                     case '7': case 'y':
                         if (player->map_x > 1 && player->map_y > 1 && world[player->y][player->x]->rival_costmap[cur_ypos - 1][cur_xpos - 1] < INT16_MAX &&
@@ -484,13 +534,13 @@ int main(int argc, char *argv[])
                             player->map_y = next_y;
                             world[player->y][player->x]->terrain_with_npcs[next_y][next_x] = world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos];
                             world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos] = world[player->y][player->x]->terrain[cur_ypos][cur_xpos];
+                            leave = 0;
                         } else if (whats_at_that_spot(player, world, player->map_y - 1, player->map_x - 1) == 'h' || whats_at_that_spot(player, world, player->map_y - 1, player->map_x - 1) == 'r' ||
                         whats_at_that_spot(player, world, player->map_y - 1, player->map_x - 1) == 'p' || whats_at_that_spot(player, world, player->map_y - 1, player->map_x - 1) == 'w' ||
                         whats_at_that_spot(player, world, player->map_y - 1, player->map_x - 1) == 's' || whats_at_that_spot(player, world, player->map_y - 1, player->map_x - 1) == 'e'){
                             printw("You have been challenged to a trainer battle!");
                         } else{
                             printw("Cannot go there!");
-                            getch();
                         } // Move upper left
                         break;
                     case '8': case 'k':
@@ -509,71 +559,185 @@ int main(int argc, char *argv[])
                             player->map_y = next_y;
                             world[player->y][player->x]->terrain_with_npcs[next_y][next_x] = world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos];
                             world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos] = world[player->y][player->x]->terrain[cur_ypos][cur_xpos];
+                            leave = 0;
 
-                        }  else if (whats_at_that_spot(player, world, player->map_y - 1, player->map_x) == 'h' || whats_at_that_spot(player, world, player->map_y - 1, player->map_x) == 'r' ||
+                        } else if (whats_at_that_spot(player, world, player->map_y - 1, player->map_x) == 'h' || whats_at_that_spot(player, world, player->map_y - 1, player->map_x) == 'r' ||
                         whats_at_that_spot(player, world, player->map_y - 1, player->map_x) == 'p' || whats_at_that_spot(player, world, player->map_y - 1, player->map_x) == 'w' ||
                         whats_at_that_spot(player, world, player->map_y - 1, player->map_x) == 's' || whats_at_that_spot(player, world, player->map_y - 1, player->map_x) == 'e'){
                             printw("You have been challenged to a trainer battle!");
                         } else{
                             printw("Cannot go there!");
-                            getch();
                         } // Move up
                         break;
                     case '9': case 'u':
-                        if (world[player->y][player->x]->npcs[cur->id - 1].y_pos > 1 && player->map_x < 79 && world[player->y][player->x]->rival_costmap[cur_ypos - 1][cur_xpos + 1] < INT16_MAX) {
+                        if (world[player->y][player->x]->npcs[cur->id - 1].y_pos > 1 && player->map_x < 79 && world[player->y][player->x]->rival_costmap[cur_ypos - 1][cur_xpos + 1] < INT16_MAX &&
+                        (world[player->y][player->x]->terrain_with_npcs[cur_ypos - 1][cur_xpos + 1] != '@' && world[player->y][player->x]->terrain_with_npcs[cur_ypos - 1][cur_xpos + 1] != 'h' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos - 1][cur_xpos + 1] != 'r' && world[player->y][player->x]->terrain_with_npcs[cur_ypos - 1][cur_xpos + 1] != 'p' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos - 1][cur_xpos + 1] != 'w' && world[player->y][player->x]->terrain_with_npcs[cur_ypos - 1][cur_xpos + 1] != 's' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos - 1][cur_xpos + 1] != 'e')) {
+
                             next_y = player->map_y - 1;
                             next_x = player->map_x + 1;
+
+                            cur->time += abs(world[player->y][player->x]->rival_costmap[cur_ypos][cur_xpos] - world[player->y][player->x]->rival_costmap[next_y][next_x]);
+                            
+                            player->map_x = next_x;
+                            player->map_y = next_y;
+                            world[player->y][player->x]->terrain_with_npcs[next_y][next_x] = world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos];
+                            world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos] = world[player->y][player->x]->terrain[cur_ypos][cur_xpos];
+                            leave = 0;
+                        } else if (whats_at_that_spot(player, world, player->map_y - 1, player->map_x + 1) == 'h' || whats_at_that_spot(player, world, player->map_y - 1, player->map_x + 1) == 'r' ||
+                        whats_at_that_spot(player, world, player->map_y - 1, player->map_x + 1) == 'p' || whats_at_that_spot(player, world, player->map_y - 1, player->map_x + 1) == 'w' ||
+                        whats_at_that_spot(player, world, player->map_y - 1, player->map_x + 1) == 's' || whats_at_that_spot(player, world, player->map_y - 1, player->map_x + 1) == 'e'){
+                            printw("You have been challenged to a trainer battle!");
+                        } else{
+                            printw("Cannot go there!");
                         } // Move upper right
                         break;
                     case '6': case 'l':
-                        if (player->map_x < 79 && world[player->y][player->x]->rival_costmap[cur_ypos][cur_xpos + 1] < INT16_MAX){
+                        if (player->map_x < 79 && world[player->y][player->x]->rival_costmap[cur_ypos][cur_xpos + 1] < INT16_MAX &&
+                        (world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos + 1] != '@' && world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos + 1] != 'h' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos + 1] != 'r' && world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos + 1] != 'p' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos + 1] != 'w' && world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos + 1] != 's' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos + 1] != 'e')){
                             next_x = player->map_x + 1;
                             next_y = player->map_y;
 
+                            cur->time += abs(world[player->y][player->x]->rival_costmap[cur_ypos][cur_xpos] - world[player->y][player->x]->rival_costmap[next_y][next_x]);
+                            
+                            player->map_x = next_x;
+                            player->map_y = next_y;
+                            world[player->y][player->x]->terrain_with_npcs[next_y][next_x] = world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos];
+                            world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos] = world[player->y][player->x]->terrain[cur_ypos][cur_xpos];
+                            leave = 0;
+                        } else if (whats_at_that_spot(player, world, player->map_y, player->map_x + 1) == 'h' || whats_at_that_spot(player, world, player->map_y, player->map_x + 1) == 'r' ||
+                        whats_at_that_spot(player, world, player->map_y, player->map_x + 1) == 'p' || whats_at_that_spot(player, world, player->map_y, player->map_x + 1) == 'w' ||
+                        whats_at_that_spot(player, world, player->map_y, player->map_x + 1) == 's' || whats_at_that_spot(player, world, player->map_y, player->map_x + 1) == 'e'){
+                            printw("You have been challenged to a trainer battle!");
+                        } else{
+                            printw("Cannot go there!");
                         } // Move right
                         break;
                     case '3': case 'n':
-                        if (world[player->y][player->x]->npcs[cur->id - 1].y_pos < 20 && player->map_x < 79 && world[player->y][player->x]->rival_costmap[cur_ypos + 1][cur_xpos + 1] < INT16_MAX) {
+                        if (world[player->y][player->x]->npcs[cur->id - 1].y_pos < 20 && player->map_x < 79 && world[player->y][player->x]->rival_costmap[cur_ypos + 1][cur_xpos + 1] < INT16_MAX &&
+                        (world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos + 1] != '@' && world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos + 1] != 'h' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos + 1] != 'r' && world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos + 1] != 'p' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos + 1] != 'w' && world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos + 1] != 's' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos + 1] != 'e')) {
+
                             next_x = player->map_x + 1;
                             next_y = player->map_y + 1;
+                            
+                            cur->time += abs(world[player->y][player->x]->rival_costmap[cur_ypos][cur_xpos] - world[player->y][player->x]->rival_costmap[next_y][next_x]);
+                            
+                            player->map_x = next_x;
+                            player->map_y = next_y;
+                            world[player->y][player->x]->terrain_with_npcs[next_y][next_x] = world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos];
+                            world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos] = world[player->y][player->x]->terrain[cur_ypos][cur_xpos];
+                            leave = 0;
+                        } else if (whats_at_that_spot(player, world, player->map_y + 1, player->map_x + 1) == 'h' || whats_at_that_spot(player, world, player->map_y + 1, player->map_x + 1) == 'r' ||
+                        whats_at_that_spot(player, world, player->map_y + 1, player->map_x + 1) == 'p' || whats_at_that_spot(player, world, player->map_y + 1, player->map_x + 1) == 'w' ||
+                        whats_at_that_spot(player, world, player->map_y + 1, player->map_x + 1) == 's' || whats_at_that_spot(player, world, player->map_y + 1, player->map_x + 1) == 'e'){
+                            printw("You have been challenged to a trainer battle!");
+                        } else{
+                            printw("Cannot go there!");
                         } // Move lower right
                         break;
                     case '2': case 'j':
-                        if (world[player->y][player->x]->npcs[cur->id - 1].y_pos < 20 && world[player->y][player->x]->rival_costmap[cur_ypos + 1][cur_xpos] < INT16_MAX){
+                        if (world[player->y][player->x]->npcs[cur->id - 1].y_pos < 20 && world[player->y][player->x]->rival_costmap[cur_ypos + 1][cur_xpos] < INT16_MAX &&
+                        (world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos] != '@' && world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos] != 'h' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos] != 'r' && world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos] != 'p' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos] != 'w' && world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos] != 's' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos] != 'e')){
                             next_y = player->map_y + 1;
                             next_x = player->map_x;
+
+                            cur->time += abs(world[player->y][player->x]->rival_costmap[cur_ypos][cur_xpos] - world[player->y][player->x]->rival_costmap[next_y][next_x]);
+                            
+                            player->map_x = next_x;
+                            player->map_y = next_y;
+                            world[player->y][player->x]->terrain_with_npcs[next_y][next_x] = world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos];
+                            world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos] = world[player->y][player->x]->terrain[cur_ypos][cur_xpos];
+                            leave = 0;
+                        } else if (whats_at_that_spot(player, world, player->map_y + 1, player->map_x) == 'h' || whats_at_that_spot(player, world, player->map_y + 1, player->map_x) == 'r' ||
+                        whats_at_that_spot(player, world, player->map_y + 1, player->map_x) == 'p' || whats_at_that_spot(player, world, player->map_y + 1, player->map_x) == 'w' ||
+                        whats_at_that_spot(player, world, player->map_y + 1, player->map_x) == 's' || whats_at_that_spot(player, world, player->map_y + 1, player->map_x) == 'e'){
+                            printw("You have been challenged to a trainer battle!");
+                        } else{
+                            printw("Cannot go there!");
                         } // Move down
                         break;
                     case '1': case 'b':
-                        if (world[player->y][player->x]->npcs[cur->id - 1].y_pos < 20 && player->map_x > 1 &&  world[player->y][player->x]->rival_costmap[cur_ypos + 1][cur_xpos - 1] < INT16_MAX) {
+                        if (world[player->y][player->x]->npcs[cur->id - 1].y_pos < 20 && player->map_x > 1 &&  world[player->y][player->x]->rival_costmap[cur_ypos + 1][cur_xpos - 1] < INT16_MAX &&
+                        (world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos - 1] != '@' && world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos - 1] != 'h' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos - 1] != 'r' && world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos - 1] != 'p' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos - 1] != 'w' && world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos - 1] != 's' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos + 1][cur_xpos - 1] != 'e')) {
                             next_y = player->map_y + 1;
                             next_x = player->map_x - 1;
+
+                            cur->time += abs(world[player->y][player->x]->rival_costmap[cur_ypos][cur_xpos] - world[player->y][player->x]->rival_costmap[next_y][next_x]);
+                            
+                            player->map_x = next_x;
+                            player->map_y = next_y;
+                            world[player->y][player->x]->terrain_with_npcs[next_y][next_x] = world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos];
+                            world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos] = world[player->y][player->x]->terrain[cur_ypos][cur_xpos];
+                            leave = 0;
+                        } else if (whats_at_that_spot(player, world, player->map_y + 1, player->map_x - 1) == 'h' || whats_at_that_spot(player, world, player->map_y + 1, player->map_x - 1) == 'r' ||
+                        whats_at_that_spot(player, world, player->map_y + 1, player->map_x - 1) == 'p' || whats_at_that_spot(player, world, player->map_y + 1, player->map_x - 1) == 'w' ||
+                        whats_at_that_spot(player, world, player->map_y + 1, player->map_x - 1) == 's' || whats_at_that_spot(player, world, player->map_y + 1, player->map_x - 1) == 'e'){
+                            printw("You have been challenged to a trainer battle!");
+                        } else{
+                            printw("Cannot go there!");
                         } // Move lower left
                         break;
                     case '4': case 'h':
-                        if (player->map_x > 1 &&  world[player->y][player->x]->rival_costmap[cur_ypos][cur_xpos - 1] < INT16_MAX){
+                        if (player->map_x > 1 &&  world[player->y][player->x]->rival_costmap[cur_ypos][cur_xpos - 1] < INT16_MAX &&
+                        (world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos - 1] != '@' && world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos - 1] != 'h' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos - 1] != 'r' && world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos - 1] != 'p' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos - 1] != 'w' && world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos - 1] != 's' && 
+                        world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos - 1] != 'e')){
+
                             next_x = player->map_x - 1;
                             next_y = player->map_y;
+
+                            cur->time += abs(world[player->y][player->x]->rival_costmap[cur_ypos][cur_xpos] - world[player->y][player->x]->rival_costmap[next_y][next_x]);
+                            
+                            player->map_x = next_x;
+                            player->map_y = next_y;
+                            world[player->y][player->x]->terrain_with_npcs[next_y][next_x] = world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos];
+                            world[player->y][player->x]->terrain_with_npcs[cur_ypos][cur_xpos] = world[player->y][player->x]->terrain[cur_ypos][cur_xpos];
+                            leave = 0;
+                        } else if (whats_at_that_spot(player, world, player->map_y, player->map_x - 1) == 'h' || whats_at_that_spot(player, world, player->map_y, player->map_x - 1) == 'r' ||
+                        whats_at_that_spot(player, world, player->map_y, player->map_x - 1) == 'p' || whats_at_that_spot(player, world, player->map_y, player->map_x - 1) == 'w' ||
+                        whats_at_that_spot(player, world, player->map_y, player->map_x - 1) == 's' || whats_at_that_spot(player, world, player->map_y, player->map_x - 1) == 'e'){
+                            printw("You have been challenged to a trainer battle!");
+                        } else{
+                            printw("Cannot go there!");
                         } // Move left
                         break;
                     case '>':
                         // Placeholder for entering a building interface
-                        printw("Entering building interface...");
-                        getch(); // Wait for user input to continue
+                        if(world[player->y][player->x]->terrain_with_npcs[player->map_y][player->map_y]){
+                            printw("Entering building interface...");
+                        } else{
+                            printw("Not on a Building.");
+                        }
                         break;
                     case '5': case ' ': case '.':
                         // Rest for a turn
                         break;
                     case 't':
-                        // Display a list of trainers
                         printw("Trainer list:\n");
                         // Placeholder for trainer list display
-                        getch(); // Wait for user input to continue
+                        getch();
                         break;
                 }
-                compute_cost_map(world[player->y][player->x], player, PLAYER_TYPE_RIVAL);
-                compute_cost_map(world[player->y][player->x], player, PLAYER_TYPE_HIKER);
-                break;
+                if (leave == 0){
+                    compute_cost_map(world[player->y][player->x], player, PLAYER_TYPE_RIVAL);
+                    compute_cost_map(world[player->y][player->x], player, PLAYER_TYPE_HIKER);
+                    break;
+                }
             }
         }
 
