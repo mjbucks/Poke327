@@ -31,4 +31,9 @@ gcc -Wall -Werror -g heap.c -c
 gcc MapGeneration.o main.o heap.o -o main
 /usr/bin/ld: cannot open output file main: No such file or directory
 collect2: error: ld returned 1 exit status
-make: *** [Makefile:2: main] Error 1
+make: *** [Makefile:2: main] Error 1$
+
+Assignment05: This is the ncurses assignment. To run this version of the code, run 'make' in the terminal, and then run './main'. Once the code compiles and has been run,
+you should see the colorful terrain of the current map. You can move around the map using the commands in the assignment 5 spec. This will allow you to
+freely move around the map, while the npcs will try to hunt you down and pathfind to you. Once you try to move over an npc, you will be notified that
+a battle has started. If you use the '>' command while on a building, you will see a message that you have entered that building.

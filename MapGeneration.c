@@ -371,7 +371,7 @@ int get_cost_of_terrain(char terrain_type, int player_type, int y, int x) {
             return 15;
         }
         else {
-            return INT16_MAX - 1;
+            return INT16_MAX;
         }
     }
     if (terrain_type == '^'){ // TREES
