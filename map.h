@@ -23,5 +23,6 @@ struct map {
 };
 
 int generate_map(struct map *m, struct map* world[WORLD_HEIGHT][WORLD_WIDTH], struct pc* player, int numtrainers);
+void compute_cost_map(struct map *m, struct pc* player, int player_type);
 
 #endif // MAP_H
